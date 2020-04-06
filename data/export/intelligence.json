@@ -16,7 +16,7 @@
         {
             "children": [
                 2,
-                3
+                10
             ],
             "color": 0,
             "comment": "",
@@ -40,40 +40,40 @@
         },
         {
             "children": [
-                4,
-                5
+                11,
+                12
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 3,
+            "idx": 10,
             "is_collapsed": false,
             "parent": 1,
-            "type": "mul"
+            "type": "percent_add"
         },
         {
             "children": [],
-            "color": 0,
+            "color": 4294967295,
             "comment": "",
             "extra": {
                 "value": "int_add_per"
             },
-            "idx": 4,
+            "idx": 11,
             "is_collapsed": false,
-            "parent": 3,
+            "parent": 10,
             "type": "input"
         },
         {
             "children": [
-                6,
-                7
+                13,
+                14
             ],
-            "color": 0,
+            "color": 4294967295,
             "comment": "",
             "extra": {},
-            "idx": 5,
+            "idx": 12,
             "is_collapsed": false,
-            "parent": 3,
+            "parent": 10,
             "type": "add"
         },
         {
@@ -83,22 +83,22 @@
             "extra": {
                 "value": "intelligence_base"
             },
-            "idx": 6,
+            "idx": 13,
             "is_collapsed": false,
-            "parent": 5,
+            "parent": 12,
             "type": "input"
         },
         {
             "children": [
-                8,
-                9
+                15,
+                16
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 7,
+            "idx": 14,
             "is_collapsed": false,
-            "parent": 5,
+            "parent": 12,
             "type": "mul"
         },
         {
@@ -108,9 +108,9 @@
             "extra": {
                 "value": "level"
             },
-            "idx": 8,
+            "idx": 15,
             "is_collapsed": false,
-            "parent": 7,
+            "parent": 14,
             "type": "input"
         },
         {
@@ -120,11 +120,11 @@
             "extra": {
                 "value": "int_level_cof"
             },
-            "idx": 9,
+            "idx": 16,
             "is_collapsed": false,
-            "parent": 7,
+            "parent": 14,
             "type": "input"
         }
     ],
-    "signature": "06-04-2020 22:33:50"
+    "signature": "07-04-2020 00:51:32"
 }

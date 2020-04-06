@@ -1,4 +1,5 @@
-#include <tree_editor/common/dialogs/editable_item.h>
+﻿#include <tree_editor/common/dialogs/editable_item.h>
+#include <tree_editor/common/choice_manager.h>
 #include "formula_nodes.h"
 
 using namespace spiritsaway::tree_editor;
@@ -25,9 +26,18 @@ std::string formula_node::display_text() const
 	{
 		return std::to_string(_idx) + ":" + _type + ":" + std::to_string(_show_widget->find("value")->_value.get<double>());
 	}
-	else if (_type == "import" || _type == "input")
+	else if (_type == "import")
 	{
-		return std::to_string(_idx) + ":" + _type + ":" + _show_widget->find("value")->_value.get<std::string>();
+		auto cur_str = choice_manager::instance().get_choice_comment("import_attrs", _show_widget->find("value")->_value.get<std::string>());
+		cur_str = cur_str.substr(cur_str.find(":"));
+		return std::to_string(_idx) + ":" + _type  + cur_str;
+
+	}
+	else if (_type == "input")
+	{
+		auto cur_str = choice_manager::instance().get_choice_comment("input_attrs", _show_widget->find("value")->_value.get<std::string>());
+		cur_str = cur_str.substr(cur_str.find(":"));
+		return std::to_string(_idx) + ":" + _type  + cur_str;
 	}
 	else
 	{

@@ -126,6 +126,26 @@ bool cacl_node_base::update(const std::vector<double>& inputs)
 			result += one_val;
 		}
 		result /= inputs.size();
+	case node_type::percent_add:
+		result = (1 + inputs[0] / 100.0) *inputs[1];
+		break;
+	case node_type::clamp:
+		double a = inputs[0];
+		double b = inputs[1];
+		double c = inputs[2];
+		if (a < b)
+		{
+			result = b;
+		}
+		else if (a > c)
+		{
+			result = c;
+		}
+		else
+		{
+			result = a;
+		}
+		break;
 	default:
 		result = value;
 		break;

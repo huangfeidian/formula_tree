@@ -16,7 +16,7 @@
         {
             "children": [
                 8,
-                9
+                22
             ],
             "color": 0,
             "comment": "",
@@ -40,67 +40,41 @@
         },
         {
             "children": [
-                10,
-                15
+                23,
+                24
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 9,
+            "idx": 22,
             "is_collapsed": false,
             "parent": 7,
-            "type": "mul"
+            "type": "percent_add"
         },
         {
-            "children": [
-                11,
-                12
-            ],
-            "color": 0,
+            "children": [],
+            "color": 4294967295,
             "comment": "",
-            "extra": {},
-            "idx": 10,
+            "extra": {
+                "value": "hp_add_per"
+            },
+            "idx": 23,
             "is_collapsed": false,
-            "parent": 9,
-            "type": "add"
+            "parent": 22,
+            "type": "input"
         },
         {
             "children": [
-                16,
-                17
+                25,
+                26
             ],
             "color": 4294967295,
             "comment": "",
             "extra": {},
-            "idx": 15,
+            "idx": 24,
             "is_collapsed": false,
-            "parent": 9,
+            "parent": 22,
             "type": "add"
-        },
-        {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": 1.0
-            },
-            "idx": 11,
-            "is_collapsed": false,
-            "parent": 10,
-            "type": "literal"
-        },
-        {
-            "children": [
-                13,
-                14
-            ],
-            "color": 0,
-            "comment": "",
-            "extra": {},
-            "idx": 12,
-            "is_collapsed": false,
-            "parent": 10,
-            "type": "div"
         },
         {
             "children": [],
@@ -109,47 +83,23 @@
             "extra": {
                 "value": "hp_base"
             },
-            "idx": 16,
+            "idx": 25,
             "is_collapsed": false,
-            "parent": 15,
+            "parent": 24,
             "type": "input"
         },
         {
             "children": [
-                18,
-                21
+                27,
+                28
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 17,
+            "idx": 26,
             "is_collapsed": false,
-            "parent": 15,
+            "parent": 24,
             "type": "mul"
-        },
-        {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": "hp_add_per"
-            },
-            "idx": 13,
-            "is_collapsed": false,
-            "parent": 12,
-            "type": "input"
-        },
-        {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": 100.0
-            },
-            "idx": 14,
-            "is_collapsed": false,
-            "parent": 12,
-            "type": "literal"
         },
         {
             "children": [],
@@ -158,9 +108,9 @@
             "extra": {
                 "value": "strength"
             },
-            "idx": 18,
+            "idx": 27,
             "is_collapsed": false,
-            "parent": 17,
+            "parent": 26,
             "type": "import"
         },
         {
@@ -170,11 +120,11 @@
             "extra": {
                 "value": "hp_str_cof"
             },
-            "idx": 21,
+            "idx": 28,
             "is_collapsed": false,
-            "parent": 17,
+            "parent": 26,
             "type": "input"
         }
     ],
-    "signature": "06-04-2020 22:23:05"
+    "signature": "07-04-2020 00:53:24"
 }

@@ -27,5 +27,7 @@ namespace spiritsaway::formula_tree::runtime
         max,
         min,
         average,
+		clamp,
+		percent_add
     };
 }

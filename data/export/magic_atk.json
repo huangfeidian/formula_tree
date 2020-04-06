@@ -16,7 +16,7 @@
         {
             "children": [
                 2,
-                3
+                17
             ],
             "color": 0,
             "comment": "",
@@ -40,141 +40,66 @@
         },
         {
             "children": [
-                4,
-                9
+                18,
+                26
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 3,
+            "idx": 17,
             "is_collapsed": false,
             "parent": 1,
-            "type": "mul"
-        },
-        {
-            "children": [
-                5,
-                6
-            ],
-            "color": 0,
-            "comment": "",
-            "extra": {},
-            "idx": 4,
-            "is_collapsed": false,
-            "parent": 3,
-            "type": "add"
-        },
-        {
-            "children": [
-                11,
-                16
-            ],
-            "color": 0,
-            "comment": "",
-            "extra": {},
-            "idx": 9,
-            "is_collapsed": false,
-            "parent": 3,
-            "type": "mul"
+            "type": "percent_add"
         },
         {
             "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": 1.0
-            },
-            "idx": 5,
-            "is_collapsed": false,
-            "parent": 4,
-            "type": "literal"
-        },
-        {
-            "children": [
-                7,
-                8
-            ],
-            "color": 0,
-            "comment": "",
-            "extra": {},
-            "idx": 6,
-            "is_collapsed": false,
-            "parent": 4,
-            "type": "div"
-        },
-        {
-            "children": [
-                12,
-                13
-            ],
-            "color": 0,
-            "comment": "",
-            "extra": {},
-            "idx": 11,
-            "is_collapsed": false,
-            "parent": 9,
-            "type": "add"
-        },
-        {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": "magic_cast_atk"
-            },
-            "idx": 16,
-            "is_collapsed": false,
-            "parent": 9,
-            "type": "input"
-        },
-        {
-            "children": [],
-            "color": 0,
+            "color": 4294967295,
             "comment": "",
             "extra": {
                 "value": "magic_atk_add_per"
             },
-            "idx": 7,
+            "idx": 18,
             "is_collapsed": false,
-            "parent": 6,
+            "parent": 17,
             "type": "input"
         },
         {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": 100.0
-            },
-            "idx": 8,
-            "is_collapsed": false,
-            "parent": 6,
-            "type": "literal"
-        },
-        {
-            "children": [],
-            "color": 0,
-            "comment": "",
-            "extra": {
-                "value": 1.0
-            },
-            "idx": 12,
-            "is_collapsed": false,
-            "parent": 11,
-            "type": "literal"
-        },
-        {
             "children": [
-                14,
-                15
+                27,
+                30
             ],
             "color": 0,
             "comment": "",
             "extra": {},
-            "idx": 13,
+            "idx": 26,
             "is_collapsed": false,
-            "parent": 11,
+            "parent": 17,
+            "type": "percent_add"
+        },
+        {
+            "children": [
+                28,
+                29
+            ],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {},
+            "idx": 27,
+            "is_collapsed": false,
+            "parent": 26,
             "type": "mul"
+        },
+        {
+            "children": [],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {
+                "value": "magic_cast_atk"
+            },
+            "idx": 30,
+            "is_collapsed": false,
+            "parent": 26,
+            "type": "input"
         },
         {
             "children": [],
@@ -183,9 +108,9 @@
             "extra": {
                 "value": "intelligence"
             },
-            "idx": 14,
+            "idx": 28,
             "is_collapsed": false,
-            "parent": 13,
+            "parent": 27,
             "type": "import"
         },
         {
@@ -193,13 +118,13 @@
             "color": 0,
             "comment": "",
             "extra": {
-                "value": 0.03
+                "value": 2.0
             },
-            "idx": 15,
+            "idx": 29,
             "is_collapsed": false,
-            "parent": 13,
+            "parent": 27,
             "type": "literal"
         }
     ],
-    "signature": "06-04-2020 22:52:24"
+    "signature": "07-04-2020 00:52:29"
 }

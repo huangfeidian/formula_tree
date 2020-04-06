@@ -153,5 +153,18 @@
 			"child_max": 1,
 			"comment": "root node of a math tree",
 			"editable_item": {}
+	},
+	"clamp": {
+		"child_min": 3,
+		"child_max": 3,
+		"editable_item": {},
+		"comment": "a<c?c:(a>b?b:a)"
+	},
+	"percent_add":{
+		"child_min": 2,
+		"child_max": 2,
+		"editable_item": {},
+		"comment": "(1 + a/100)*b"
 	}
+	
 }
