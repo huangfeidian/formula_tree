@@ -1,0 +1,80 @@
+{
+    "extra": {},
+    "name": "magic_resist.json",
+    "nodes": [
+        {
+            "children": [
+                4
+            ],
+            "color": 0,
+            "comment": "法术抗性",
+            "extra": {},
+            "idx": 0,
+            "is_collapsed": false,
+            "type": "root"
+        },
+        {
+            "children": [
+                5,
+                8
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 4,
+            "is_collapsed": false,
+            "parent": 0,
+            "type": "min"
+        },
+        {
+            "children": [
+                6,
+                7
+            ],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {},
+            "idx": 5,
+            "is_collapsed": false,
+            "parent": 4,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": 99.0
+            },
+            "idx": 8,
+            "is_collapsed": false,
+            "parent": 4,
+            "type": "literal"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "magic_resist_base"
+            },
+            "idx": 6,
+            "is_collapsed": false,
+            "parent": 5,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "magic_resist_add"
+            },
+            "idx": 7,
+            "is_collapsed": false,
+            "parent": 5,
+            "type": "input"
+        }
+    ],
+    "signature": "06-04-2020 23:34:14"
+}

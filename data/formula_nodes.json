@@ -1,0 +1,157 @@
+{
+	"add": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a+b"
+	},
+	"dec": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a-b"
+
+	},
+	"mul": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a*b"
+	},
+	"div": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a/b"
+	},
+	"neg": {
+			"comment": "-1*a",
+			"child_min": 1,
+			"child_max": 1,
+			"editable_item": {}
+	},
+	"literal": {
+			"child_min": 0,
+			"child_max": 0,
+			"comment": "a number value",
+			"editable_item": {
+					"name": "value",
+					"type": "_float",
+					"value": 0
+			}
+	},
+	"input": {
+			"child_min": 0,
+			"child_max": 0,
+			"comment": "an input attr name",
+			"editable_item": {
+					"name": "value",
+					"type": "_choice",
+					"value": "level",
+					"choice_type": "input_attrs"
+			}
+	},
+	"import": {
+			"child_min": 0,
+			"child_max": 0,
+			"comment": "an import attr name",
+			"editable_item": {
+					"name": "value",
+					"type": "_choice",
+					"value": "strength",
+					"choice_type": "import_attrs"
+			}
+	},
+	"random": {
+			"comment": "uniform[a,b)",
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {}
+			
+	},
+	"condition": {
+			"child_min": 3,
+			"child_max": 3,
+			"comment": "a>0.5?b:c",
+			"editable_item": {}
+	},
+	"less_than": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a<b?1.0:0.0"
+	},
+	"less_eq": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a<=b?1.0:0.0"
+	},
+	"larger_than": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a>b?1.0:0.0"
+	},
+	"larger_eq": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a>=b?1.0:0.0"
+	},
+	"equals": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a==b?1.0:0.0"
+	},
+	"not_equal": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a!=b?1.0:0.0"
+	},
+	"logic_not": {
+			"child_min": 1,
+			"child_max": 1,
+			"editable_item": {},
+			"comment": "a<0.5?1.0:0.0"
+	},
+	"logic_or": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "a>0.5||b>0.5?1.0:0.0"
+
+	},
+	"pow": {
+			"child_min": 2,
+			"child_max": 2,
+			"editable_item": {},
+			"comment": "pow(a, b)"
+	},
+	"max": {
+			"child_min": 1,
+			"child_max": 10,
+			"editable_item": {},
+			"comment": "max(a,...)"
+	},
+	"min": {
+			"child_min": 1,
+			"child_max": 10,
+			"editable_item": {},
+			"comment": "min(a,...)"
+	},
+	"average": {
+			"child_min": 1,
+			"child_max": 10,
+			"editable_item": {},
+			"comment": "sum(a,...)/N"
+	},
+	"root": {
+			"child_min": 1,
+			"child_max": 1,
+			"comment": "root node of a math tree",
+			"editable_item": {}
+	}
+}

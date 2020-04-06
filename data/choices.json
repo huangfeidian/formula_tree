@@ -1,0 +1,53 @@
+{
+	"input_attrs": 
+	{
+		"level": "等级",
+		"strength_base": "基础力量",
+		"dexterity_base": "基础敏捷",
+		"intelligence_base": "基础智力",
+		"str_level_cof": "力量等级系数",
+		"dex_level_cof": "敏捷等级系数",
+		"int_level_cof": "智力等级系数",
+		"hp_base": "基础血量",
+		"hp_str_cof": "血量力量系数",
+		"armor_base": "基础护甲",
+		"armor_add": "简单护甲加成",
+		"armor_dex_cof": "护甲敏捷系数",
+		"phy_atk_base": "基础物理伤害",
+		"phy_atk_add": "简单物理伤害加成",
+		"phy_atk_add_per": "百分比物理伤害加成",
+		"main_attr": "主属性",
+		"hp_add": "简单血量加成",
+		"hp_add_per": "百分比血量加成",
+		"str_add": "简单力量加成",
+		"dex_add": "简单敏捷加成",
+		"int_add": "简单智力加成",
+		"str_add_per": "百分比力量加成",
+		"dex_add_per": "百分比敏捷加成",
+		"int_add_per": "百分比智力加成",
+		"magic_atk_base": "基础魔法伤害",
+		"magic_atk_add": "简单法伤加成",
+		"magic_atk_add_per": "百分比法伤加成",
+		"magic_atk_int_cof": "法伤智力加成因子",
+		"magic_resist_base": "基础法术抗性",
+		"magic_resist_add": "简单法抗加成",
+		"current_hp": "当前血量",
+		"input_phy_atk": "受到物理伤害",
+		"input_magic_atk": "受到法术伤害",
+		"magic_cast_atk": "启动法术伤害"
+
+	},
+	"import_attrs":
+	{
+		"max_hp": "最大血量",
+		"strength": "力量",
+		"dexterity": "敏捷",
+		"intelligence": "智力",
+		"armor": "护甲",
+		"phy_atk": "物理伤害",
+		"magic_atk": "法术伤害",
+		"magic_resist": "法术抗性",
+		"output_phy_atk": "最终物理伤害",
+		"output_magic_atk": "最终法术伤害"
+	}
+}

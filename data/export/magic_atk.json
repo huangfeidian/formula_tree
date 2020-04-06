@@ -1,0 +1,205 @@
+{
+    "extra": {},
+    "name": "magic_atk.json",
+    "nodes": [
+        {
+            "children": [
+                1
+            ],
+            "color": 0,
+            "comment": "法术伤害",
+            "extra": {},
+            "idx": 0,
+            "is_collapsed": false,
+            "type": "root"
+        },
+        {
+            "children": [
+                2,
+                3
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 1,
+            "is_collapsed": false,
+            "parent": 0,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "magic_atk_add"
+            },
+            "idx": 2,
+            "is_collapsed": false,
+            "parent": 1,
+            "type": "input"
+        },
+        {
+            "children": [
+                4,
+                9
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 3,
+            "is_collapsed": false,
+            "parent": 1,
+            "type": "mul"
+        },
+        {
+            "children": [
+                5,
+                6
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 4,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "add"
+        },
+        {
+            "children": [
+                11,
+                16
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 9,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "mul"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": 1.0
+            },
+            "idx": 5,
+            "is_collapsed": false,
+            "parent": 4,
+            "type": "literal"
+        },
+        {
+            "children": [
+                7,
+                8
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 6,
+            "is_collapsed": false,
+            "parent": 4,
+            "type": "div"
+        },
+        {
+            "children": [
+                12,
+                13
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 11,
+            "is_collapsed": false,
+            "parent": 9,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "magic_cast_atk"
+            },
+            "idx": 16,
+            "is_collapsed": false,
+            "parent": 9,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "magic_atk_add_per"
+            },
+            "idx": 7,
+            "is_collapsed": false,
+            "parent": 6,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": 100.0
+            },
+            "idx": 8,
+            "is_collapsed": false,
+            "parent": 6,
+            "type": "literal"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": 1.0
+            },
+            "idx": 12,
+            "is_collapsed": false,
+            "parent": 11,
+            "type": "literal"
+        },
+        {
+            "children": [
+                14,
+                15
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 13,
+            "is_collapsed": false,
+            "parent": 11,
+            "type": "mul"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "intelligence"
+            },
+            "idx": 14,
+            "is_collapsed": false,
+            "parent": 13,
+            "type": "import"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": 0.03
+            },
+            "idx": 15,
+            "is_collapsed": false,
+            "parent": 13,
+            "type": "literal"
+        }
+    ],
+    "signature": "06-04-2020 22:52:24"
+}

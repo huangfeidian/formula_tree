@@ -1,0 +1,130 @@
+{
+    "extra": {},
+    "name": "strength.json",
+    "nodes": [
+        {
+            "children": [
+                1
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 0,
+            "is_collapsed": false,
+            "type": "root"
+        },
+        {
+            "children": [
+                2,
+                3
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 1,
+            "is_collapsed": false,
+            "parent": 0,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "str_add"
+            },
+            "idx": 2,
+            "is_collapsed": false,
+            "parent": 1,
+            "type": "input"
+        },
+        {
+            "children": [
+                4,
+                5
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 3,
+            "is_collapsed": false,
+            "parent": 1,
+            "type": "mul"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "str_add_per"
+            },
+            "idx": 4,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "input"
+        },
+        {
+            "children": [
+                6,
+                7
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 5,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "strength_base"
+            },
+            "idx": 6,
+            "is_collapsed": false,
+            "parent": 5,
+            "type": "input"
+        },
+        {
+            "children": [
+                8,
+                9
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 7,
+            "is_collapsed": false,
+            "parent": 5,
+            "type": "mul"
+        },
+        {
+            "children": [],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {
+                "value": "level"
+            },
+            "idx": 8,
+            "is_collapsed": false,
+            "parent": 7,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "str_level_cof"
+            },
+            "idx": 9,
+            "is_collapsed": false,
+            "parent": 7,
+            "type": "input"
+        }
+    ],
+    "signature": "06-04-2020 22:23:42"
+}

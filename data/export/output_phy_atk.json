@@ -1,0 +1,105 @@
+{
+    "extra": {},
+    "name": "output_phy_atk.json",
+    "nodes": [
+        {
+            "children": [
+                3
+            ],
+            "color": 0,
+            "comment": "伤害计算公式",
+            "extra": {},
+            "idx": 0,
+            "is_collapsed": false,
+            "type": "root"
+        },
+        {
+            "children": [
+                10,
+                7
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 3,
+            "is_collapsed": false,
+            "parent": 0,
+            "type": "div"
+        },
+        {
+            "children": [
+                11,
+                12
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 10,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "mul"
+        },
+        {
+            "children": [
+                8,
+                9
+            ],
+            "color": 0,
+            "comment": "",
+            "extra": {},
+            "idx": 7,
+            "is_collapsed": false,
+            "parent": 3,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {
+                "value": "input_phy_atk"
+            },
+            "idx": 11,
+            "is_collapsed": false,
+            "parent": 10,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 4294967295,
+            "comment": "",
+            "extra": {
+                "value": "input_phy_atk"
+            },
+            "idx": 12,
+            "is_collapsed": false,
+            "parent": 10,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "input_phy_atk"
+            },
+            "idx": 8,
+            "is_collapsed": false,
+            "parent": 7,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "color": 0,
+            "comment": "",
+            "extra": {
+                "value": "armor"
+            },
+            "idx": 9,
+            "is_collapsed": false,
+            "parent": 7,
+            "type": "import"
+        }
+    ],
+    "signature": "06-04-2020 23:25:01"
+}
