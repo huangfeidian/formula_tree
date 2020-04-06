@@ -15,6 +15,8 @@ namespace spiritsaway::formula_tree::runtime
 		bool update(const std::vector<double>& children_values);
 		double uniform(double a, double b);
 		cacl_node_base(const std::string& output_name, node_type cacl_type);
+		std::string print_formula(const std::string& my_name, const std::vector<std::string>& arg_names) const;
+		std::string print_formula_value(const std::string& my_name, const std::vector<std::string>& arg_names) const;
 	};
 	struct node_compare
 	{

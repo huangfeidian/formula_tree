@@ -21,3 +21,6 @@ find_package(any_container CONFIG REQUIRED)
 
 add_library(formula_tree_runtime ${RUNTIME_SRCS})
 target_link_libraries(formula_tree_runtime nlohmann_json::nlohmann_json any_container)
+
+add_executable(print_formula ${CMAKE_SOURCE_DIR}/test/print_formula.cpp)
+target_link_libraries(print_formula formula_tree_runtime)

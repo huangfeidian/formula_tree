@@ -160,3 +160,89 @@ bool cacl_node_base::update(const std::vector<double>& inputs)
 		return true;
 	}
 }
+
+std::string cacl_node_base::print_formula(const std::string& my_name, const std::vector<std::string>& arg_names) const
+{
+	switch (cacl_type)
+	{
+	case node_type::root:
+		return my_name + " = " + arg_names[0];
+		break;
+	case node_type::literal:
+		return my_name + " = " + std::to_string(value);
+	case node_type::import:
+		return my_name + " = " + std::to_string(value);
+	case node_type::input:
+		return my_name + " = " + std::to_string(value);
+	case node_type::neg:
+		return my_name + " = -" + arg_names[0];
+	case node_type::add:
+		return my_name + " = " arg_names[0] + "+" + arg_names[1];
+	case node_type::dec:
+		return my_name + " = " arg_names[0] + "+" + arg_names[1];
+	case node_type::mul:
+		return my_name + " = " arg_names[0] + "*" + arg_names[1];
+	case node_type::div:
+		return my_name + " = " arg_names[0] + "/" + arg_names[1];
+	case node_type::random:
+		return my_name + " = random(" arg_names[0] + "," + arg_names[1] + ")";
+	case node_type::condition:
+		return my_name + " = " arg_names[0] + ">0.5?" + arg_names[1] +":" arg_names[2];
+	case node_type::less_than:
+		return my_name + " = " + arg_names[0] + "<" +arg_names[1] +"?1:0";
+	case node_type::less_eq:
+		return my_name + " = " + arg_names[0] + "<=" +arg_names[1] +"?1:0";
+	case node_type::larger_than:
+		return my_name + " = " + arg_names[0] + ">" +arg_names[1] +"?1:0";
+	case node_type::larger_eq:
+		return my_name + " = " + arg_names[0] + ">=" +arg_names[1] +"?1:0";
+	case node_type::equals:
+		return my_name + " = " + arg_names[0] + "==" +arg_names[1] +"?1:0";
+	case node_type::not_equal:
+		return my_name + " = " + arg_names[0] + "!=" +arg_names[1] +"?1:0";
+	case node_type::logic_not:
+		return my_name + " = " + arg_names[0] + "<0.5?1:0";
+	case node_type::logic_and:
+		return my_name + " = " + arg_names[0] + ">0.5&&" + arg_names[1] + ">0.5?1:0";
+	case node_type::logic_or:
+		return my_name + " = " + arg_names[0] + ">0.5||" + arg_names[1] + ">0.5?1:0";
+	case node_type::pow:
+		return my_name + " = " + "pow(" arg_names[0] + "," + arg_names[1] + ")";
+	case node_type::max:
+	{
+		std::string result = my_name + " = max(";
+		for(auto one_arg: arg_names)
+		{
+			result+=one_arg + ",";
+		}
+		result += ")";
+		return result;
+	}
+	case node_type::min:
+	{
+		std::string result = my_name + " = min(";
+		for(auto one_arg: arg_names)
+		{
+			result+=one_arg + ",";
+		}
+		result += ")";
+		return result;
+	}
+	case node_type::average:
+	{
+		std::string result = my_name + " = average(";
+		for(auto one_arg: arg_names)
+		{
+			result+=one_arg + ",";
+		}
+		result += ")";
+		return result;
+	}
+	case node_type::clamp:
+		return my_name + " = " + "clang(" arg_names[0] + "," + arg_names[1] + ","+ arg_names[2] + ")";
+	case node_type::percent_add:
+		return my_name + " = " + "(1 +" + arg_names[0] + "/100)*" + arg_names[1];
+	default:
+		return my_name;
+	}
+}
