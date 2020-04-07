@@ -24,3 +24,6 @@ target_link_libraries(formula_tree_runtime nlohmann_json::nlohmann_json any_cont
 
 add_executable(print_formula ${CMAKE_SOURCE_DIR}/test/print_formula.cpp)
 target_link_libraries(print_formula formula_tree_runtime)
+
+add_executable(print_update ${CMAKE_SOURCE_DIR}/test/print_update.cpp)
+target_link_libraries(print_update formula_tree_runtime)

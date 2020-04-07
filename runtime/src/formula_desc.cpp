@@ -20,10 +20,6 @@ bool cacl_node_desc::decode(const json& data)
 		return false;
 	}
 
-	if (!serialize::decode(data["parent"], parent))
-	{
-		return false;
-	}
 
 	if (!serialize::decode(data["children"], children))
 	{
@@ -41,9 +37,10 @@ bool cacl_node_desc::decode(const json& data)
 	}
 	type = opt_type.value();
 
-	auto temp_value = data["extra"]["value"];
+	
 	if (type == node_type::literal)
 	{
+		auto temp_value = data["extra"]["value"];
 		if (!serialize::decode(temp_value, value))
 		{
 			return false;
@@ -51,6 +48,7 @@ bool cacl_node_desc::decode(const json& data)
 	}
 	else if (type == node_type::import || type == node_type::input)
 	{
+		auto temp_value = data["extra"]["value"];
 		if (!serialize::decode(temp_value, name))
 		{
 			return false;
@@ -63,7 +61,7 @@ bool cacl_node_desc::decode(const json& data)
 void cacl_tree_repo::set_repo_dir(const std::string& in_repo_dir)
 {
 	repo_dir = in_repo_dir;
-	for (const auto& one_entry : std::filesystem::recursive_directory_iterator((in_repo_dir)))
+	for (const auto& one_entry : std::filesystem::recursive_directory_iterator(in_repo_dir))
 	{
 		if (one_entry.is_directory())
 		{
@@ -175,7 +173,7 @@ formula_desc_flat::formula_desc_flat(const formula_desc& trees)
 			flat_nodes[new_idx].idx = new_idx;
 		}
 	}
-	if (!invalid)
+	if (invalid)
 	{
 		flat_nodes.clear();
 		node_indexes.clear();

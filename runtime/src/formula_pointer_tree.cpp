@@ -1,10 +1,11 @@
 ﻿#include "formula_pointer_tree.h"
-
+#include <iostream>
 using namespace spiritsaway::formula_tree::runtime;
 
 std::vector<attr_value_pair> formula_pointer_tree::process_update_queue()
 {
 	std::vector<attr_value_pair> result;
+	std::unordered_set<std::string> reached_name;
 	while (!update_queue.empty())
 	{
 		auto cur_top = update_queue.top();
@@ -16,13 +17,26 @@ std::vector<attr_value_pair> formula_pointer_tree::process_update_queue()
 				add_node_to_update_queue(one_parent);
 			}
 		}
-		if (!(cur_top->cacl_type == node_type::root))
+
+		if (cur_top->cacl_type == node_type::root)
 		{
 			result.emplace_back(cur_top->name, cur_top->value);
+			if (debug_on)
+			{
+				cur_top->pretty_print_value(reached_name);
+			}
 		}
 	}
 	nodes_in_queue.clear();
 	return result;
+}
+void formula_pointer_tree::set_debug(bool in_debug_on)
+{
+	debug_on = in_debug_on;
+}
+formula_pointer_tree::~formula_pointer_tree()
+{
+	return;
 }
 std::optional<double> formula_pointer_tree::get_attr_value(const std::string& attr_name) const
 {
@@ -59,21 +73,28 @@ std::vector<attr_value_pair> formula_pointer_tree::update_attr_batch(const std::
 bool formula_pointer_tree::add_node_to_update_queue(cacl_pointer_node* new_node)
 {
 	auto cur_iter = nodes_in_queue.find(new_node);
-	if (cur_iter == nodes_in_queue.end())
+	if (cur_iter != nodes_in_queue.end())
 	{
 		return false;
 	}
 	nodes_in_queue.insert(new_node);
+	update_queue.push(new_node);
 	return true;
 }
-formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_info, const std::vector<attr_value_pair>& init_values)
-	: formula_tree_interface(flat_nodes_info, init_values)
+formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_info)
+	: formula_tree_interface()
 {
+	std::uint32_t name_idx = 0;
 	all_nodes.reserve(flat_nodes_info.flat_nodes.size());
 	// create all nodes
 	for (auto& one_node : flat_nodes_info.flat_nodes)
 	{
-		auto cur_pointer_node = cacl_pointer_node(this, one_node.name, one_node.type);
+		auto cur_node_name = one_node.name;
+		if (cur_node_name.empty())
+		{
+			cur_node_name = "T-" + std::to_string(name_idx++);
+		}
+		auto cur_pointer_node = cacl_pointer_node(this, cur_node_name, one_node.type);
 		all_nodes.push_back(cur_pointer_node);
 	}
 	// map names to node pointer
@@ -128,6 +149,103 @@ formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_i
 			}
 		}
 	}
-	// init values
-	update_attr_batch(init_values);
+
+}
+formula_pointer_tree::formula_pointer_tree()
+{
+
+}
+formula_pointer_tree* formula_pointer_tree::clone() const
+{
+	auto result = new formula_pointer_tree();
+	result->all_nodes = all_nodes;
+	result->name_to_nodes = name_to_nodes;
+	auto pre_vec_begin = all_nodes.data();
+	auto cur_vec_begin = result->all_nodes.data();
+	auto pointer_diff = result->all_nodes.data() - all_nodes.data();
+	for (auto&[name, pointer] : result->name_to_nodes)
+	{
+		pointer = pointer - pre_vec_begin + cur_vec_begin;
+	}
+	for (auto& one_node : result->all_nodes)
+	{
+		one_node.tree = result;
+		for (auto& pointer : one_node.children)
+		{
+			pointer = pointer - pre_vec_begin + cur_vec_begin;
+		}
+		for (auto& pointer : one_node.parents)
+		{
+			pointer = pointer - pre_vec_begin + cur_vec_begin;
+		}
+	}
+	return result;
+}
+
+void formula_pointer_tree::pretty_print() const
+{
+	std::unordered_set<std::string> reached_names;
+	for (auto[k, v] : name_to_nodes)
+	{
+		if (v->cacl_type == node_type::root)
+		{
+			if (reached_names.count(k) == 0)
+			{
+				auto pre_result = v->pretty_print(reached_names);
+				if (pre_result != k)
+				{
+					std::cout << k << "=" << pre_result << std::endl;
+
+				}
+			}
+			
+		}
+	}
+}
+
+
+void formula_pointer_tree::pretty_print_value() const
+{
+	std::unordered_set<std::string> reached_names;
+	for (auto[k, v] : name_to_nodes)
+	{
+		if (v->cacl_type == node_type::root)
+		{
+			if (reached_names.count(k) == 0)
+			{
+				auto pre_result = v->pretty_print_value(reached_names);
+				if (pre_result.find(k + "(") != 0)
+				{
+					std::cout << k << "=" << pre_result << std::endl;
+				}
+				
+			}
+		}
+	}
+}
+
+
+formula_tree_mgr::formula_tree_mgr()
+{
+
+}
+formula_tree_mgr& formula_tree_mgr::instance()
+{
+	static formula_tree_mgr the_one;
+	return the_one;
+}
+formula_pointer_tree* formula_tree_mgr::load_formula_group(const std::string& formula_group_name, const formula_desc& output_node)
+{
+	auto cur_iter = named_formulas.find(formula_group_name);
+	if (cur_iter != named_formulas.end())
+	{
+		return cur_iter->second->clone();
+	}
+	else
+	{
+		auto cur_flat_info = formula_desc_flat(output_node);
+		auto cur_tree = new formula_pointer_tree(cur_flat_info);
+		named_formulas[formula_group_name] = cur_tree;
+		return cur_tree->clone();
+	}
 }

@@ -19,11 +19,6 @@ int main()
 	};
 	cacl_tree_repo::instance().set_repo_dir("../../data/export/");
 	auto cur_formula_tree = formula_tree_mgr::instance().load_formula_group("player", formula_desc{ related_outputs });
-	std::cout << "formula print begin >>>>>>>>>>>>" << std::endl;
-	cur_formula_tree->pretty_print();
-	std::cout << "formula print end <<<<<<<<<<<<<<" << std::endl;
-
-	std::cout << "formula print value begin >>>>>>>>>>>>" << std::endl;
-	cur_formula_tree->pretty_print_value();
-	std::cout << "formula print value end <<<<<<<<<<<<<<" << std::endl;
+	cur_formula_tree->set_debug(true);
+	cur_formula_tree->update_attr("level", 2);
 }

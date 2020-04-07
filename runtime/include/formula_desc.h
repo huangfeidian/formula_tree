@@ -15,7 +15,6 @@ namespace spiritsaway::formula_tree::runtime
 		std::uint32_t idx;
 		// for non leaf nodes
 		node_type type;
-		std::uint32_t parent;
 		std::vector<std::uint32_t> children;
 		bool decode(const json& data);
 	};
