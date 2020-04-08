@@ -25,6 +25,10 @@
 属性编辑器 直接复用了我之前的那个树形编辑器，没有其他的依赖：
 1. tree_editor https://github.com/huangfeidian/tree_editor
 
+![护甲计算公式](https://github.com/huangfeidian/md_for_blog/raw/master/images/formula/armor.png)
+
+![敏捷计算公式](https://github.com/huangfeidian/md_for_blog/raw/master/images/formula/dexterity.png)
+
 这里说一下这个属性公式编辑器的工作流程：
 
 1. 叶子节点有三种类型，字面值常量，输入变量(`input name`)，引用变量(`import name`)， 输入变量只能被外部修改，而引用变量则是通过计算公式计算出来的值，无法直接被外部修改，只能通过修改输入变量来更新到引用变量。每个引用变量都有对应名字的公式输出文件。
