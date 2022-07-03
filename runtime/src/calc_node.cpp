@@ -1,11 +1,11 @@
-﻿#include <cacl_pointer_node.h>
-#include <formula_pointer_tree.h>
+﻿#include "calc_node.h"
+#include "formula_tree.h"
 #include <iostream>
 #include <random>
 
 using namespace spiritsaway::formula_tree::runtime;
 
-cacl_pointer_node::cacl_pointer_node(formula_structure_tree* in_tree, std::uint64_t in_node_idx, const std::string& output_name, node_type operation)
+calc_node::calc_node(formula_structure_tree* in_tree, std::uint64_t in_node_idx, const std::string& output_name, node_type operation)
 	: name(output_name)
 	, cacl_type(operation)
 	, tree(in_tree)
@@ -13,34 +13,18 @@ cacl_pointer_node::cacl_pointer_node(formula_structure_tree* in_tree, std::uint6
 {
 
 }
-cacl_pointer_node::cacl_pointer_node()
+calc_node::calc_node()
 {
 
 }
-//cacl_pointer_node::cacl_pointer_node(const cacl_pointer_node& other)
-//	: cacl_pointer_node(other)
-//	, height(other.height)
-//	, parents(other.parents)
-//	, children(other.children)
-//	, tree(other.tree)
-//{
-//
-//}
-//cacl_pointer_node& cacl_pointer_node::operator=(const cacl_pointer_node& other)
-//{
-//	if (this == &other)
-//	{
-//		return *this;
-//	}
-//
-//}
-void cacl_pointer_node::add_child(cacl_pointer_node* child)
+
+void calc_node::add_child(calc_node* child)
 {
 	children.push_back(child);
 	m_children_idxes.push_back(child->m_node_idx);
 	child->parents.push_back(this);
 }
-void cacl_pointer_node::update_value(formula_value_tree* value_tree, std::vector<double>& node_values, double new_value) const
+void calc_node::update_value(formula_value_tree* value_tree, std::vector<double>& node_values, double new_value) const
 {
 	if (new_value == node_values[m_node_idx])
 	{
@@ -54,7 +38,7 @@ void cacl_pointer_node::update_value(formula_value_tree* value_tree, std::vector
 }
 
 
-std::string cacl_pointer_node::pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
+std::string calc_node::pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
 {
 	switch (cacl_type)
 	{
@@ -83,7 +67,7 @@ std::string cacl_pointer_node::pretty_print(const std::vector<double>& node_valu
 		child_formulas.push_back(one_child->pretty_print(node_values, print_names));
 	}
 	
-	auto result = cacl_pointer_node::print_formula(node_values, child_formulas);
+	auto result = calc_node::print_formula(node_values, child_formulas);
 	if (result.size() >= 50)
 	{
 		std::cout << name << " = " << result << std::endl;
@@ -99,7 +83,7 @@ std::string cacl_pointer_node::pretty_print(const std::vector<double>& node_valu
 		return result;
 	}
 }
-std::string cacl_pointer_node::pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
+std::string calc_node::pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
 {
 	if (print_names.count(name) != 0)
 	{
@@ -133,7 +117,7 @@ std::string cacl_pointer_node::pretty_print_value(const std::vector<double>& nod
 		child_formulas.push_back(one_child->pretty_print_value(node_values, print_names));
 	}
 	
-	auto result = cacl_pointer_node::print_formula(node_values, child_formulas);
+	auto result = calc_node::print_formula(node_values, child_formulas);
 	if (result.size() >= 50)
 	{
 		std::cout << name + "(" + std::to_string(value) + ")" << " = " << result << std::endl;
@@ -150,7 +134,7 @@ std::string cacl_pointer_node::pretty_print_value(const std::vector<double>& nod
 	}
 }
 
-double cacl_pointer_node::uniform(double a, double b) const
+double calc_node::uniform(double a, double b) const
 {
 	static std::random_device rd;
 	static std::mt19937 seed(rd());
@@ -165,7 +149,7 @@ double cacl_pointer_node::uniform(double a, double b) const
 	}
 	return a + cur_dis(seed)* (b - a);
 }
-bool cacl_pointer_node::update(std::vector<double>& node_values) const
+bool calc_node::update(std::vector<double>& node_values) const
 {
 	double result;
 	switch (cacl_type)
@@ -305,7 +289,7 @@ bool cacl_pointer_node::update(std::vector<double>& node_values) const
 	}
 }
 
-std::string cacl_pointer_node::print_formula(const std::vector<double>& node_values, const std::vector<std::string>& arg_names) const
+std::string calc_node::print_formula(const std::vector<double>& node_values, const std::vector<std::string>& arg_names) const
 {
 	auto value = node_values[m_node_idx];
 	switch (cacl_type)

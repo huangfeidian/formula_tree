@@ -1,4 +1,4 @@
-﻿#include <formula_pointer_tree.h>
+﻿#include "formula_tree.h"
 #include <iostream>
 using namespace spiritsaway::formula_tree::runtime;
 
@@ -17,7 +17,7 @@ int main()
 		"phy_atk",
 		"strength",
 	};
-	cacl_tree_repo::instance().set_repo_dir("../../data/export/");
+	formula_tree_mgr::instance().set_repo_dir("../../data/export/");
 	auto cur_formula_tree = formula_tree_mgr::instance().load_formula_group("player", formula_desc{ related_outputs });
 	cur_formula_tree->set_debug(true);
 	cur_formula_tree->update_attr("level", 2);
