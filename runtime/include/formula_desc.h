@@ -39,9 +39,8 @@ namespace spiritsaway::formula_tree::runtime
 	};
 	struct formula_desc_flat
 	{
-		std::vector<cacl_node_desc> flat_nodes;
-		std::unordered_map<std::string, std::uint32_t> node_indexes;
-		std::vector<std::uint32_t> heights;
+		std::vector<cacl_node_desc> flat_nodes; // 相关tree里的所有节点的索引
+		std::unordered_map<std::string, std::uint32_t> node_indexes; // 所有有名字的节点的索引
 		formula_desc_flat(const formula_desc& input_trees);
 	};
 }

@@ -2,7 +2,14 @@
 #include <iostream>
 using namespace spiritsaway::formula_tree::runtime;
 
-std::vector<attr_value_pair> formula_pointer_tree::process_update_queue()
+formula_value_tree::formula_value_tree(const formula_structure_tree& in_node_tree)
+	: m_node_tree(in_node_tree)
+	, m_node_values(in_node_tree.nodes().size(), 1.0)
+	, m_node_in_queue_flag(in_node_tree.nodes().size(), 0)
+{
+
+}
+std::vector<attr_value_pair> formula_value_tree::process_update_queue()
 {
 	std::vector<attr_value_pair> result;
 	std::unordered_set<std::string> reached_name;
@@ -10,7 +17,7 @@ std::vector<attr_value_pair> formula_pointer_tree::process_update_queue()
 	{
 		auto cur_top = update_queue.top();
 		update_queue.pop();
-		if (cur_top->update())
+		if (cur_top->update(m_node_values))
 		{
 			for (auto one_parent : cur_top->parents)
 			{
@@ -20,72 +27,76 @@ std::vector<attr_value_pair> formula_pointer_tree::process_update_queue()
 
 		if (cur_top->cacl_type == node_type::root)
 		{
-			result.emplace_back(cur_top->name, cur_top->value);
-			if (debug_on)
+			result.emplace_back(cur_top->name, m_node_values[cur_top->m_node_idx]);
+			if (m_debug_on)
 			{
-				cur_top->pretty_print_value(reached_name);
+				cur_top->pretty_print_value(m_node_values, reached_name);
 			}
 		}
 	}
-	nodes_in_queue.clear();
+	for (const auto& one_idx : m_in_queue_nodes)
+	{
+		m_node_in_queue_flag[one_idx] = 0;
+	}
+	m_in_queue_nodes.clear();
 	return result;
 }
-void formula_pointer_tree::set_debug(bool in_debug_on)
+void formula_value_tree::set_debug(bool in_debug_on)
 {
-	debug_on = in_debug_on;
+	m_debug_on = in_debug_on;
 }
-formula_pointer_tree::~formula_pointer_tree()
+formula_value_tree::~formula_value_tree()
 {
 	return;
 }
-std::optional<double> formula_pointer_tree::get_attr_value(const std::string& attr_name) const
+std::optional<double> formula_value_tree::get_attr_value(const std::string& attr_name) const
 {
-	auto cur_iter = name_to_nodes.find(attr_name);
-	if (cur_iter == name_to_nodes.end())
+	const auto& name_to_idx = m_node_tree.name_to_idx();
+	auto cur_iter = name_to_idx.find(attr_name);
+	if (cur_iter == name_to_idx.end())
 	{
 		return {};
 	}
 	else
 	{
-		return cur_iter->second->value;
+		return m_node_values[cur_iter->second];
 	}
 }
-std::vector<attr_value_pair> formula_pointer_tree::update_attr(const std::string& name, double value)
+std::vector<attr_value_pair> formula_value_tree::update_attr(const std::string& name, double value)
 {
 	std::vector<attr_value_pair> args;
 	args.emplace_back(name, value);
 	return update_attr_batch(args);
 }
-std::vector<attr_value_pair> formula_pointer_tree::update_attr_batch(const std::vector<attr_value_pair>& input_attrs)
+std::vector<attr_value_pair> formula_value_tree::update_attr_batch(const std::vector<attr_value_pair>& input_attrs)
 {
-
+	const auto& name_to_idx = m_node_tree.name_to_idx();
 	for (auto one_attr : input_attrs)
 	{
-		auto cur_iter = name_to_nodes.find(one_attr.first);
-		if (cur_iter == name_to_nodes.end())
+		auto cur_iter = name_to_idx.find(one_attr.first);
+		if (cur_iter == name_to_idx.end())
 		{
 			continue;
 		}
-		cur_iter->second->update_value(one_attr.second);
+		m_node_tree.nodes()[cur_iter->second].update_value(this, m_node_values, one_attr.second);
 	}
 	return process_update_queue();
 }
-bool formula_pointer_tree::add_node_to_update_queue(cacl_pointer_node* new_node)
+bool formula_value_tree::add_node_to_update_queue(cacl_pointer_node* new_node)
 {
-	auto cur_iter = nodes_in_queue.find(new_node);
-	if (cur_iter != nodes_in_queue.end())
+	if (m_node_in_queue_flag[new_node->node_idx()])
 	{
 		return false;
 	}
-	nodes_in_queue.insert(new_node);
+	m_node_in_queue_flag[new_node->node_idx()] = 1;
+	m_in_queue_nodes.push_back(std::uint32_t(new_node->node_idx()));
 	update_queue.push(new_node);
 	return true;
 }
-formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_info)
-	: formula_tree_interface()
+formula_structure_tree::formula_structure_tree(const formula_desc_flat& flat_nodes_info)
 {
 	std::uint32_t name_idx = 0;
-	all_nodes.reserve(flat_nodes_info.flat_nodes.size());
+	m_nodes.reserve(flat_nodes_info.flat_nodes.size());
 	// create all nodes
 	for (auto& one_node : flat_nodes_info.flat_nodes)
 	{
@@ -94,25 +105,25 @@ formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_i
 		{
 			cur_node_name = "T-" + std::to_string(name_idx++);
 		}
-		auto cur_pointer_node = cacl_pointer_node(this, cur_node_name, one_node.type);
-		all_nodes.push_back(cur_pointer_node);
+		auto cur_pointer_node = cacl_pointer_node(this, m_nodes.size(), cur_node_name, one_node.type);
+		m_nodes.push_back(cur_pointer_node);
 	}
 	// map names to node pointer
-	auto node_begin_pointer = all_nodes.data();
+	auto node_begin_pointer = m_nodes.data();
 	for (const auto& [k, v] : flat_nodes_info.node_indexes)
 	{
-		name_to_nodes[k] = node_begin_pointer + v;
+		m_name_to_idx[k] = v;
 	}
-	std::unordered_map<cacl_pointer_node*, std::uint32_t> node_child_count;
+	std::vector<std::uint64_t> node_child_count(m_nodes.size(), 0);
 	std::deque<cacl_pointer_node*> height_queue;
 	// replace import/input leaf nodes with mapped node pointer
 	for (auto& one_node : flat_nodes_info.flat_nodes)
 	{
-		auto& cur_node = all_nodes[one_node.idx];
+		auto& cur_node = m_nodes[one_node.idx];
 		auto cur_child_size = one_node.children.size();
 		if (cur_child_size)
 		{
-			node_child_count[node_begin_pointer + one_node.idx] = cur_child_size;
+			node_child_count[one_node.idx] = cur_child_size;
 		}
 		else
 		{
@@ -129,7 +140,7 @@ formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_i
 			else
 			{
 				// for import input children nodes
-				cur_node.add_child(name_to_nodes[cur_child_name]);
+				cur_node.add_child(&m_nodes[m_name_to_idx[cur_child_name]]);
 			}
 		}
 	}
@@ -140,9 +151,9 @@ formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_i
 		height_queue.pop_front();
 		for (auto one_parent : cur_node->parents)
 		{
-			one_parent->height = std::max(one_parent->height, cur_node->height + 1);
+			one_parent->m_height = std::max(one_parent->m_height, cur_node->m_height + 1);
 
-			auto cur_child_count = node_child_count[one_parent]--;
+			auto cur_child_count = node_child_count[one_parent->m_node_idx]--;
 			if (cur_child_count == 1)
 			{
 				height_queue.push_back(one_parent);
@@ -151,47 +162,20 @@ formula_pointer_tree::formula_pointer_tree(const formula_desc_flat& flat_nodes_i
 	}
 
 }
-formula_pointer_tree::formula_pointer_tree()
-{
 
-}
-formula_pointer_tree* formula_pointer_tree::clone() const
-{
-	auto result = new formula_pointer_tree();
-	result->all_nodes = all_nodes;
-	result->name_to_nodes = name_to_nodes;
-	auto pre_vec_begin = all_nodes.data();
-	auto cur_vec_begin = result->all_nodes.data();
-	auto pointer_diff = result->all_nodes.data() - all_nodes.data();
-	for (auto&[name, pointer] : result->name_to_nodes)
-	{
-		pointer = pointer - pre_vec_begin + cur_vec_begin;
-	}
-	for (auto& one_node : result->all_nodes)
-	{
-		one_node.tree = result;
-		for (auto& pointer : one_node.children)
-		{
-			pointer = pointer - pre_vec_begin + cur_vec_begin;
-		}
-		for (auto& pointer : one_node.parents)
-		{
-			pointer = pointer - pre_vec_begin + cur_vec_begin;
-		}
-	}
-	return result;
-}
 
-void formula_pointer_tree::pretty_print() const
+void formula_value_tree::pretty_print() const
 {
 	std::unordered_set<std::string> reached_names;
-	for (auto[k, v] : name_to_nodes)
+	const auto& temp_nodes = m_node_tree.nodes();
+	for (auto[k, v] : m_node_tree.name_to_idx())
 	{
-		if (v->cacl_type == node_type::root)
+		const auto& cur_node = temp_nodes[v];
+		if (cur_node.cacl_type == node_type::root)
 		{
 			if (reached_names.count(k) == 0)
 			{
-				auto pre_result = v->pretty_print(reached_names);
+				auto pre_result = cur_node.pretty_print(m_node_values, reached_names);
 				if (pre_result != k)
 				{
 					std::cout << k << "=" << pre_result << std::endl;
@@ -204,16 +188,18 @@ void formula_pointer_tree::pretty_print() const
 }
 
 
-void formula_pointer_tree::pretty_print_value() const
+void formula_value_tree::pretty_print_value() const
 {
 	std::unordered_set<std::string> reached_names;
-	for (auto[k, v] : name_to_nodes)
+	const auto& temp_nodes = m_node_tree.nodes();
+	for (auto[k, v] : m_node_tree.name_to_idx())
 	{
-		if (v->cacl_type == node_type::root)
+		const auto& cur_node = temp_nodes[v];
+		if (cur_node.cacl_type == node_type::root)
 		{
 			if (reached_names.count(k) == 0)
 			{
-				auto pre_result = v->pretty_print_value(reached_names);
+				auto pre_result = cur_node.pretty_print_value(m_node_values, reached_names);
 				if (pre_result.find(k + "(") != 0)
 				{
 					std::cout << k << "=" << pre_result << std::endl;
@@ -234,18 +220,18 @@ formula_tree_mgr& formula_tree_mgr::instance()
 	static formula_tree_mgr the_one;
 	return the_one;
 }
-formula_pointer_tree* formula_tree_mgr::load_formula_group(const std::string& formula_group_name, const formula_desc& output_node)
+formula_value_tree* formula_tree_mgr::load_formula_group(const std::string& formula_group_name, const formula_desc& output_node)
 {
 	auto cur_iter = named_formulas.find(formula_group_name);
 	if (cur_iter != named_formulas.end())
 	{
-		return cur_iter->second->clone();
+		return new formula_value_tree(*cur_iter->second);
 	}
 	else
 	{
 		auto cur_flat_info = formula_desc_flat(output_node);
-		auto cur_tree = new formula_pointer_tree(cur_flat_info);
+		auto cur_tree = new formula_structure_tree(cur_flat_info);
 		named_formulas[formula_group_name] = cur_tree;
-		return cur_tree->clone();
+		return new formula_value_tree(*cur_tree);
 	}
 }
