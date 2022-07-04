@@ -28,6 +28,9 @@ target_link_libraries(print_formula formula_tree_runtime)
 add_executable(print_update ${CMAKE_SOURCE_DIR}/test/print_update.cpp)
 target_link_libraries(print_update formula_tree_runtime)
 
+add_executable(parse_formula ${CMAKE_SOURCE_DIR}/test/parse_formula.cpp)
+target_link_libraries(parse_formula formula_tree_runtime)
+
 foreach(p LIB BIN INCLUDE)
 	set(var CMAKE_INSTALL_${p}DIR)
 	if(NOT IS_ABSOLUTE "${${var}}")
