@@ -34,8 +34,13 @@ struct tree_node
 	std::string token;
 	double value;
 	node_type m_type;
-	void convert_args()
+	bool convert_args(const std::unordered_map<std::string, std::int8_t>& func_arg_num)
 	{
+		auto cur_iter = func_arg_num.find(token);
+		if (cur_iter == func_arg_num.end())
+		{
+			return false;
+		}
 		auto cur_top = children[0];
 		children.clear();
 		while (true)
@@ -52,6 +57,14 @@ struct tree_node
 				children.push_back(cur_top);
 				break;
 			}
+		}
+		if (cur_iter->second < 0)
+		{
+			return !children.empty();
+		}
+		else
+		{
+			return children.size() == cur_iter->second;
 		}
 	}
 	std::string to_string() const
@@ -184,7 +197,7 @@ std::vector< std::pair<std::string_view, token_type>> split_tokens(std::string_v
 
 
 
-tree_node* create_math_tree(const std::string& input, const std::unordered_map<std::string, std::uint8_t>& func_arg_num)
+tree_node* create_math_tree(const std::string& input, const std::unordered_map<std::string, std::int8_t>& func_arg_num)
 {
 	std::unordered_map<std::string_view, op_priority> op_priority_map = {
 		{"(", op_priority::func_paren},
@@ -257,6 +270,7 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 			{
 				if (m_op_stack.empty())
 				{
+					std::cout << "op stack empty while ) meet" << std::endl;
 					fail = true;
 					break;
 				}
@@ -273,7 +287,11 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 							new_node->token = cur_top.second;
 							new_node->m_type = node_type::func;
 							new_node->children.push_back(m_value_stack.top().second);
-							new_node->convert_args();
+							if (!new_node->convert_args(func_arg_num))
+							{
+								std::cout << "func " << new_node->to_string() << " called with invalid arg num" << std::endl;
+								break;
+							}
 							m_value_stack.pop();
 							m_value_stack.emplace(std::make_pair(cur_top.second, new_node));
 						}
@@ -282,6 +300,12 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 					}
 					else
 					{
+						if (m_value_stack.size() < 2)
+						{
+							std::cout << "value stack should has at least 2 node when meet " << cur_top.second << std::endl;
+							fail = true;
+							break;
+						}
 						auto new_node = new tree_node();
 						new_node->token = cur_top.second;
 						new_node->m_type = node_type::op;
@@ -302,6 +326,12 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 					if (int(cur_top.first) >= int(cur_pri) && cur_top.first != op_priority::func_paren)
 					{
 						m_op_stack.pop();
+						if (m_value_stack.size() < 2)
+						{
+							std::cout << "value stack should has at least 2 node when meet " << cur_top.second << std::endl;
+							fail = true;
+							break;
+						}
 						auto new_node = new tree_node();
 						new_node->token = cur_top.second;
 						new_node->m_type = node_type::op;
@@ -354,7 +384,7 @@ int main()
 		"1* 2 - 3 + add(2, 3)",
 		"1 * var_1 - var_2 * 3"
 	};
-	std::unordered_map<std::string, std::uint8_t> func_arg_num = {
+	std::unordered_map<std::string, std::int8_t> func_arg_num = {
 		{"sin", 1},
 		{"add", 2}
 	};
