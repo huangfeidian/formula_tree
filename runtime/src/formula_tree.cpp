@@ -14,9 +14,8 @@ formula_value_tree::formula_value_tree(const formula_structure_tree& in_node_tre
 {
 
 }
-std::vector<attr_value_pair> formula_value_tree::process_update_queue()
+void formula_value_tree::process_update_queue()
 {
-	std::vector<attr_value_pair> result;
 	std::unordered_set<std::string> reached_name;
 	while (!update_queue.empty())
 	{
@@ -32,7 +31,7 @@ std::vector<attr_value_pair> formula_value_tree::process_update_queue()
 
 		if (cur_top->cacl_type == node_type::root)
 		{
-			result.emplace_back(cur_top->name, m_node_values[cur_top->m_node_idx]);
+			m_updated_attrs.push_back(attr_update_info{ cur_top->m_node_idx, m_node_values[cur_top->m_node_idx] });
 			if (m_debug_on)
 			{
 				cur_top->pretty_print_value(m_node_values, reached_name);
@@ -44,7 +43,6 @@ std::vector<attr_value_pair> formula_value_tree::process_update_queue()
 		m_node_in_queue_flag[one_idx] = 0;
 	}
 	m_in_queue_nodes.clear();
-	return result;
 }
 void formula_value_tree::set_debug(bool in_debug_on)
 {
@@ -67,13 +65,36 @@ std::optional<double> formula_value_tree::get_attr_value(const std::string& attr
 		return m_node_values[cur_iter->second];
 	}
 }
-std::vector<attr_value_pair> formula_value_tree::update_attr(const std::string& name, double value)
+std::optional<double> formula_value_tree::get_attr_value(std::uint32_t node_idx) const
 {
-	std::vector<attr_value_pair> args;
-	args.emplace_back(name, value);
-	return update_attr_batch(args);
+	if (node_idx >= m_node_values.size())
+	{
+		return {};
+	}
+	else
+	{
+		return m_node_values[node_idx];
+	}
 }
-std::vector<attr_value_pair> formula_value_tree::update_attr_batch(const std::vector<attr_value_pair>& input_attrs)
+
+void formula_value_tree::update_attr(const std::string& name, double value)
+{
+	std::vector<std::pair<std::string, double>> args;
+	args.emplace_back(name, value);
+	update_attr_batch(args);
+}
+void formula_value_tree::update_attr(const std::uint32_t node_idx, double value)
+{
+	if (node_idx >= m_node_values.size())
+	{
+		return;
+	}
+
+	m_node_tree.nodes()[node_idx].update_value(this, m_node_values, value);
+	m_updated_attrs.clear();
+	return process_update_queue();
+}
+void formula_value_tree::update_attr_batch(const std::vector<std::pair<std::string, double>>& input_attrs)
 {
 	const auto& name_to_idx = m_node_tree.name_to_idx();
 	for (auto one_attr : input_attrs)
@@ -85,8 +106,24 @@ std::vector<attr_value_pair> formula_value_tree::update_attr_batch(const std::ve
 		}
 		m_node_tree.nodes()[cur_iter->second].update_value(this, m_node_values, one_attr.second);
 	}
+	m_updated_attrs.clear();
 	return process_update_queue();
 }
+
+void formula_value_tree::update_attr_batch(const std::vector<std::pair<std::uint32_t, double>>& input_attrs)
+{
+	for (auto one_attr : input_attrs)
+	{
+		if (one_attr.first >= m_node_values.size())
+		{
+			continue;
+		}
+		m_node_tree.nodes()[one_attr.first].update_value(this, m_node_values, one_attr.second);
+	}
+	m_updated_attrs.clear();
+	return process_update_queue();
+}
+
 bool formula_value_tree::add_node_to_update_queue(const calc_node* new_node)
 {
 	if (m_node_in_queue_flag[new_node->node_idx()])

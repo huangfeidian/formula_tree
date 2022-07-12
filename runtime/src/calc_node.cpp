@@ -5,7 +5,7 @@
 
 using namespace spiritsaway::formula_tree::runtime;
 
-calc_node::calc_node(formula_structure_tree* in_tree, std::uint64_t in_node_idx, const std::string& output_name, node_type operation)
+calc_node::calc_node(formula_structure_tree* in_tree, std::uint32_t in_node_idx, const std::string& output_name, node_type operation)
 	: name(output_name)
 	, cacl_type(operation)
 	, tree(in_tree)

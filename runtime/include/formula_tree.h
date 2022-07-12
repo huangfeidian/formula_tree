@@ -38,35 +38,52 @@ namespace spiritsaway::formula_tree::runtime
 
 		friend class formula_tree_mgr;
 	};
-	using attr_value_pair = std::pair<std::string, double>;
+	struct attr_update_info
+	{
+		std::uint32_t node_idx;
+		double value;
+	};
 	class formula_value_tree
 	{
 		std::vector<double> m_node_values;
+		std::vector< attr_update_info> m_updated_attrs;
 		const formula_structure_tree& m_node_tree;
 
 		std::priority_queue<const calc_node*, std::vector<const calc_node*>, node_compare> update_queue;
 		std::vector<std::uint8_t> m_node_in_queue_flag;
 		std::vector<std::uint32_t> m_in_queue_nodes;
-		
 		bool m_debug_on = false;
 		bool add_node_to_update_queue(const calc_node* new_node);
 		friend class calc_node;
-		std::vector<attr_value_pair> process_update_queue();
+		void process_update_queue();
 
 		friend class formula_tree_mgr;
 	public:
 		formula_value_tree(const formula_structure_tree& in_node_tree);
 		std::optional<double> get_attr_value(const std::string& attr_name) const;
-		std::vector<attr_value_pair> update_attr(const std::string& attr_name, double value);
-		std::vector<attr_value_pair> update_attr_batch(const std::vector<attr_value_pair>& input_attrs);
-		const std::unordered_map<std::string, std::uint32_t>& name_to_node_idx() const
+		std::optional<double> get_attr_value(std::uint32_t node_idx) const;
+		void update_attr(const std::string& attr_name, double value);
+		void update_attr(const std::uint32_t node_idx, double value);
+		void update_attr_batch(const std::vector<std::pair<std::string, double>>& input_attrs);
+		void update_attr_batch(const std::vector<std::pair<std::uint32_t, double>>& input_attrs);
+		std::uint32_t name_to_node_idx(const std::string& attr_name) const;
+		const std::string& node_idx_to_name(std::uint32_t node_idx) const
 		{
-			return m_node_tree.name_to_idx();
+			static std::string invalid_name = "invalid";
+			if (node_idx >= m_node_tree.nodes().size())
+			{
+				return invalid_name;
+			}
+			return m_node_tree.nodes()[node_idx].name;
 		}
 		~formula_value_tree();
 		void pretty_print() const;
 		void pretty_print_value() const;
 		void set_debug(bool debug_on);
+		const std::vector< attr_update_info>& updated_attrs() const
+		{
+			return m_updated_attrs;
+		}
 
 	};
 	class formula_tree_mgr

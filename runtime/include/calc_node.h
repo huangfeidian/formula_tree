@@ -11,7 +11,7 @@ namespace spiritsaway::formula_tree::runtime
 		std::vector<std::uint32_t> m_children_idxes;
 		std::vector<calc_node*> parents;
 		formula_structure_tree* tree = nullptr;
-		std::uint64_t m_node_idx = 0;
+		std::uint32_t m_node_idx = 0;
 		node_type cacl_type;
 		std::uint32_t m_height = 0;
 		std::string name;
@@ -19,13 +19,13 @@ namespace spiritsaway::formula_tree::runtime
 		friend class formula_value_tree;
 	public:
 		calc_node();
-		calc_node(formula_structure_tree* tree, std::uint64_t in_node_idx, const std::string& output_name, node_type cacl_type);
+		calc_node(formula_structure_tree* tree, std::uint32_t in_node_idx, const std::string& output_name, node_type cacl_type);
 
 		void add_child(calc_node* child);
 		void update_value(formula_value_tree* value_tree, std::vector<double>& node_values, double new_value) const;
 		bool update(std::vector<double>& node_values) const;
 		double uniform(double a, double b) const;
-		std::uint64_t node_idx() const
+		std::uint32_t node_idx() const
 		{
 			return m_node_idx;
 		}
