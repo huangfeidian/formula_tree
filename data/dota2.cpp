@@ -1,0 +1,47 @@
+double base_strength = 1.0;
+double base_dexterity = 1.0;
+double base_intelligence = 1.0;
+double extra_str = 0.0;
+double extra_dex = 0.0;
+double extra_int = 0.0;
+double str_per_level = 1.0;
+double dex_per_level = 1.0;
+double int_per_level = 1.0;
+double level = 1.0;
+double base_armor = 0;
+double extra_armor = 0;
+double armor_per_dex = 1;
+double base_physical_damage = 10;
+double extra_physical_damage = 0;
+double base_magic_defence = 15;
+double extra_magic_defence = 0;
+double base_health = 500;
+double base_mana = 100;
+double extra_health = 0;
+double extra_mana = 0;
+double health_per_str = 20;
+double mana_per_int = 10;
+double base_health_recovery = 2.0;
+double base_mana_recovery = 1.0;
+double extra_health_recovery = 0.0;
+double extra_mana_recovery = 0.0;
+double main_attr = 1.0;
+double base_attack_gap = 2.0;
+double minimal_attack_gap = 0.2;
+double attack_speed_per_dex = 1;
+double extra_attack_speed = 0;
+
+
+double min(double, double);
+double max(double, double);
+double clamp(double min, double max, double cur);
+
+double strength = base_strength + extra_str + level * str_per_level;
+double dexterity = base_dexterity + extra_dex + level * dex_per_level;
+double intelligence = base_intelligence + extra_int + level * int_per_level;
+double armor = base_armor + extra_armor + dexterity * armor_per_dex;
+double health = base_health + extra_health + strength * health_per_str;
+double mana = base_mana + extra_mana + intelligence * mana_per_int;
+double physical_damage = base_physical_damage + main_attr + extra_physical_damage;
+double attack_speed = 100  + extra_attack_speed + attack_speed_per_dex * dexterity;
+double attack_gap = max(minimal_attack_gap, base_attack_gap * 100 / attack_speed);
