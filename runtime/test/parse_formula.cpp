@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <string_view>
 #include <cstdlib>
+#include <fstream>
+#include <filesystem>
+
 enum class op_priority
 {
 	comma,
@@ -104,7 +107,10 @@ std::string_view remove_blank(std::string_view remain_str)
 		}
 		return remain_str.substr(i);
 	}
+	return remain_str;
 }
+
+
 
 // parse double value
 std::uint32_t get_num_token(std::string_view remain_str)
@@ -138,6 +144,7 @@ std::uint32_t get_variable_token(std::string_view remain_str)
 		}
 		return i;
 	}
+	return remain_str.size();
 }
 
 std::uint32_t get_op_token(std::string_view remain_str)
@@ -196,6 +203,19 @@ std::vector< std::pair<std::string_view, token_type>> split_tokens(std::string_v
 }
 
 
+std::string_view strip_token(std::string_view input_str)
+{
+	auto cur_token_vec = split_tokens(input_str);
+	if (cur_token_vec.size() != 1)
+	{
+		return {};
+	}
+	if (cur_token_vec[0].second != token_type::var)
+	{
+		return {};
+	}
+	return cur_token_vec[0].first;
+}
 
 tree_node* create_math_tree(const std::string& input, const std::unordered_map<std::string, std::int8_t>& func_arg_num)
 {
@@ -227,13 +247,13 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 		switch (one_token.second)
 		{
 		case token_type::value:
-			{
-				auto new_node = new tree_node();
-				new_node->token = one_token.first;
-				new_node->m_type = node_type::value;
-				m_value_stack.emplace(std::make_pair(one_token.first, new_node));
-				break;
-			}
+		{
+			auto new_node = new tree_node();
+			new_node->token = one_token.first;
+			new_node->m_type = node_type::value;
+			m_value_stack.emplace(std::make_pair(one_token.first, new_node));
+			break;
+		}
 		case token_type::var:
 		{
 			auto cur_iter = func_arg_num.find(std::string(one_token.first));
@@ -356,7 +376,7 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 			fail = true;
 			break;
 		}
-		
+
 	}
 	if (fail && m_value_stack.size() != 1)
 	{
@@ -368,7 +388,7 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 	}
 }
 
-int main()
+void simple_test()
 {
 	std::vector<std::string> test_formulas = {
 		"1",
@@ -403,6 +423,119 @@ int main()
 			std::cout << "fail to parse: " << one_str << std::endl;
 		}
 	}
+}
+
+void test_cpp_file(const std::string& file_path)
+{
+	std::ifstream fsm(file_path);
+	std::string temp_line;
+	std::unordered_map<std::string, double> input_vars;
+	std::unordered_map<std::string, std::int8_t> input_funcs;
+	std::unordered_map<std::string, tree_node*> output_vars;
+	while (std::getline(fsm, temp_line))
+	{
+		if (temp_line.empty())
+		{
+			continue;
+		}
+		auto end_iter = temp_line.find(";");
+		if (end_iter == std::string::npos)
+		{
+			continue;
+		}
+		temp_line = temp_line.substr(0, end_iter);
+		auto assign_iter = temp_line.find("=");
+		if (assign_iter == std::string::npos)
+		{
+			// parse function
+			std::string function_prefix = "double ";
+			auto function_begin_iter = temp_line.find(function_prefix);
+			if (function_begin_iter == std::string::npos)
+			{
+				std::cerr << "invalid function line " << temp_line << std::endl;
+				continue;
+			}
+			function_begin_iter += function_prefix.size();
+			auto function_end_iter = temp_line.find('(', function_begin_iter);
+			if (function_end_iter == std::string::npos)
+			{
+				std::cerr << "invalid function line " << temp_line << std::endl;
+				continue;
+			}
+			auto cur_func_name = temp_line.substr(function_begin_iter, function_end_iter - function_begin_iter - 1);
+			cur_func_name = strip_token(cur_func_name);
+			if (cur_func_name.empty())
+			{
+				std::cerr << "invalid function line " << temp_line << std::endl;
+				continue;
+			}
+			int func_arg_num = 0;
+			function_end_iter = temp_line.find(function_prefix, function_end_iter);
+			while (function_end_iter != std::string::npos)
+			{
+				func_arg_num++;
+				function_end_iter += function_prefix.size();
+				function_end_iter = temp_line.find(function_prefix, function_end_iter);
+			}
+			input_funcs[cur_func_name] = func_arg_num;
+		}
+		else
+		{
+			std::string var_prefix = "double ";
+			auto var_begin_iter = temp_line.find(var_prefix);
+			if (var_begin_iter == std::string::npos)
+			{
+				std::cerr << "invalid variable declear " << temp_line << std::endl;
+				continue;
+			}
+			var_begin_iter += var_prefix.size();
+			std::string cur_var_name = temp_line.substr(var_begin_iter, assign_iter - var_begin_iter - 1);
+			cur_var_name = strip_token(cur_var_name);
+			if (input_vars.find(cur_var_name) != input_vars.end() || output_vars.find(cur_var_name) != output_vars.end())
+			{
+				std::cerr << "duplicated var name " << cur_var_name << std::endl;
+				continue;
+			}
+			auto remain_str_after_assign = temp_line.substr(assign_iter + 1);
+			auto remain_tokens = split_tokens(remain_str_after_assign);
+			if (remain_tokens.size() == 0)
+			{
+				std::cerr << "invalid  var declear " << temp_line << std::endl;
+				continue;
+			}
+			if (remain_tokens.size() == 1)
+			{
+				char* number_end = nullptr;
+				const char* number_begin = remain_tokens[0].first.data();
+				auto cur_value = std::strtold(number_begin, &number_end);
+				if (number_end == number_begin)
+				{
+					std::cerr << "invalid  input declear " << temp_line << std::endl;
+					continue;
+				}
+				input_vars[cur_var_name] = cur_value;
+				std::cout << "get input var " << cur_var_name << " with value " << cur_value << std::endl;
+			}
+			else
+			{
+				auto cur_formula = create_math_tree(remain_str_after_assign, input_funcs);
+				if (!cur_formula)
+				{
+					std::cerr << "invalid output declear " << temp_line << std::endl;
+					continue;
+				}
+				output_vars[cur_var_name] = cur_formula;
+				std::cout << "get output var " << cur_var_name << " with formula " << cur_formula->to_string() << std::endl;
+			}
+		}
+
+	}
+}
+int main()
+{
+	std::cout << std::filesystem::current_path() << std::endl;
+	// simple_test();
+	test_cpp_file("../../data/dota2.cpp");
 	return 1;
 
 }
