@@ -32,9 +32,14 @@ double attack_speed_per_dex = 1;
 double extra_attack_speed = 0;
 
 
-double min(double, double);
-double max(double, double);
+double min(...);
+double max(...);
+double average(...);
+double mul(...);
+double add(...);
 double clamp(double min, double max, double cur);
+double pow(double base, double index);
+
 
 double strength = base_strength + extra_str + level * str_per_level;
 double dexterity = base_dexterity + extra_dex + level * dex_per_level;

@@ -17,6 +17,7 @@ namespace spiritsaway::formula_tree::runtime
 		node_type type;
 		std::vector<std::uint32_t> children;
 		bool decode(const json& data);
+		json encode() const;
 	};
 	// every formula tree has a output name
 	struct cacl_tree

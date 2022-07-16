@@ -59,5 +59,17 @@ bool cacl_node_desc::decode(const json& data)
 
 }
 
+json cacl_node_desc::encode() const
+{
+	json result;
+	result["name"] = name;
+	result["extra"]["value"] = value;
+	result["type"] = magic_enum::enum_name(type);
+	result["children"] = children;
+	result["idx"] = idx;
+	return result;
+
+}
+
 
 

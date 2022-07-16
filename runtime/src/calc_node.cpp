@@ -187,39 +187,6 @@ bool calc_node::update(std::vector<double>& node_values) const
 			result = node_values[m_children_idxes[0]] / node_values[m_children_idxes[1]];
 		}
 		break;
-	case node_type::random:
-		result = uniform(node_values[m_children_idxes[0]], node_values[m_children_idxes[1]]);
-		break;
-	case node_type::condition:
-		result = node_values[m_children_idxes[0]] * node_values[m_children_idxes[1]] + (1 - node_values[m_children_idxes[0]]) * node_values[m_children_idxes[2]];
-		break;
-	case node_type::less_than:
-		result = node_values[m_children_idxes[0]] < node_values[m_children_idxes[1]] ? 1.0 : 0.0;
-		break;
-	case node_type::less_eq:
-		result = node_values[m_children_idxes[0]] <= node_values[m_children_idxes[1]] ? 1.0 : 0.0;
-		break;
-	case node_type::larger_than:
-		result = node_values[m_children_idxes[0]] > node_values[m_children_idxes[1]] ? 1.0 : 0.0;
-		break;
-	case node_type::larger_eq:
-		result = node_values[m_children_idxes[0]] >= node_values[m_children_idxes[1]] ? 1.0 : 0.0;
-		break;
-	case node_type::equals:
-		result = node_values[m_children_idxes[0]] == node_values[m_children_idxes[1]] ? 1.0 : 0.0;
-		break;
-	case node_type::not_equal:
-		result = node_values[m_children_idxes[0]] == node_values[m_children_idxes[1]] ? 0.0 : 1.0;
-		break;
-	case node_type::logic_not:
-		result = node_values[m_children_idxes[0]] > 0.5 ? 0.0 : 1.0;
-		break;
-	case node_type::logic_and:
-		result = node_values[m_children_idxes[0]] * node_values[m_children_idxes[1]] > 0.5 ? 1.0 : 0.0;
-		break;
-	case node_type::logic_or:
-		result = node_values[m_children_idxes[0]] + node_values[m_children_idxes[1]] > 0.5 ? 1.0 : 0.0;
-		break;
 	case node_type::pow:
 		result = std::pow(node_values[m_children_idxes[0]], node_values[m_children_idxes[1]]);
 		break;
@@ -303,8 +270,6 @@ std::string calc_node::print_formula(const std::vector<double>& node_values, con
 		return  std::to_string(value);
 	case node_type::input:
 		return  std::to_string(value);
-	case node_type::neg:
-		return "(-" + arg_names[0] + ")";
 	case node_type::add:
 		return  "(" + arg_names[0] + "+" + arg_names[1] + ")";
 	case node_type::dec:
@@ -313,28 +278,6 @@ std::string calc_node::print_formula(const std::vector<double>& node_values, con
 		return  arg_names[0] + "*" + arg_names[1];
 	case node_type::div:
 		return  arg_names[0] + "/" + arg_names[1];
-	case node_type::random:
-		return "random(" + arg_names[0] + "," + arg_names[1] + ")";
-	case node_type::condition:
-		return  "(" + arg_names[0] + ">0.5?" + arg_names[1] +":" + arg_names[2] + ")";
-	case node_type::less_than:
-		return  "(" + arg_names[0] + "<" +arg_names[1] +"?1:0)";
-	case node_type::less_eq:
-		return  "(" + arg_names[0] + "<=" +arg_names[1] +"?1:0)";
-	case node_type::larger_than:
-		return  "(" + arg_names[0] + ">" +arg_names[1] +"?1:0)";
-	case node_type::larger_eq:
-		return  "(" + arg_names[0] + ">=" +arg_names[1] +"?1:0)";
-	case node_type::equals:
-		return  "(" + arg_names[0] + "==" +arg_names[1] +"?1:0)";
-	case node_type::not_equal:
-		return  "(" + arg_names[0] + "!=" +arg_names[1] +"?1:0)";
-	case node_type::logic_not:
-		return  "(" + arg_names[0] + "<0.5?1:0";
-	case node_type::logic_and:
-		return  "(" + arg_names[0] + ">0.5&&" + arg_names[1] + ">0.5?1:0)";
-	case node_type::logic_or:
-		return  "(" + arg_names[0] + ">0.5||" + arg_names[1] + ">0.5?1:0)";
 	case node_type::pow:
 		return  "pow(" + arg_names[0] + "," + arg_names[1] + ")";
 	case node_type::max:

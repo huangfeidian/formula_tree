@@ -7,6 +7,12 @@
 #include <cstdlib>
 #include <fstream>
 #include <filesystem>
+#include <unordered_set>
+#include <magic_enum.hpp>
+#include <any_container/encode.h>
+#include "formula_desc.h"
+
+using namespace spiritsaway::formula_tree::runtime;
 
 enum class op_priority
 {
@@ -16,9 +22,10 @@ enum class op_priority
 	func_paren,
 };
 
-enum class node_type
+enum class tree_node_type
 {
 	value,
+	variable,
 	op,
 	func
 };
@@ -36,8 +43,9 @@ struct tree_node
 	std::vector<tree_node*> children;
 	std::string token;
 	double value;
-	node_type m_type;
-	bool convert_args(const std::unordered_map<std::string, std::int8_t>& func_arg_num)
+	tree_node_type m_type;
+	std::uint32_t node_idx;
+	bool convert_args(const std::unordered_map<std::string, std::uint8_t>& func_arg_num)
 	{
 		auto cur_iter = func_arg_num.find(token);
 		if (cur_iter == func_arg_num.end())
@@ -48,7 +56,7 @@ struct tree_node
 		children.clear();
 		while (true)
 		{
-			if (cur_top->m_type == node_type::op && cur_top->token == ",")
+			if (cur_top->m_type == tree_node_type::op && cur_top->token == ",")
 			{
 				children.push_back(cur_top->children[0]);
 				auto pre_top = cur_top;
@@ -61,7 +69,7 @@ struct tree_node
 				break;
 			}
 		}
-		if (cur_iter->second < 0)
+		if (cur_iter->second == 0)
 		{
 			return !children.empty();
 		}
@@ -74,11 +82,22 @@ struct tree_node
 	{
 		switch (m_type)
 		{
-		case node_type::op:
-			return std::string("(") + children[0]->to_string() + std::string(token) + children[1]->to_string() + std::string(")");
-		case node_type::value:
+		case tree_node_type::op:
+		{
+			std::string result;
+			result += std::string("(") + children[0]->to_string();
+			for (int i = 1; i < children.size(); i++)
+			{
+				result += std::string(token) + children[i]->to_string();
+			}
+			result += std::string(")");
+			return result;
+		}
+
+		case tree_node_type::value:
+		case tree_node_type::variable:
 			return std::string(token);
-		case node_type::func:
+		case tree_node_type::func:
 		{
 			std::string result;
 			result += std::string(token);
@@ -94,6 +113,105 @@ struct tree_node
 		}
 		default:
 			return "invalid";
+		}
+	}
+	void to_tree(const std::unordered_set<std::string>& input_nodes, cacl_tree& result) const
+	{
+		cacl_node_desc cur_desc;
+		cur_desc.idx = node_idx;
+		for (const auto& one_child : children)
+		{
+			cur_desc.children.push_back(one_child->node_idx);
+			one_child->to_tree(input_nodes, result);
+		}
+		cur_desc.name = token;
+		switch (m_type)
+		{
+		case tree_node_type::value:
+		{
+			cur_desc.value = value;
+			cur_desc.type = node_type::literal;
+		}
+			break;
+		case tree_node_type::variable:
+		{
+			if (input_nodes.count(std::string(token)) == 1)
+			{
+				cur_desc.type = node_type::input;
+			}
+			else
+			{
+				cur_desc.type = node_type::import;
+			}
+		}
+			break;
+		case tree_node_type::op:
+		{
+			if (token[0] == '+')
+			{
+				cur_desc.type = node_type::add;
+			}
+			else if (token[0] == '-')
+			{
+				cur_desc.type = node_type::dec;
+			}
+			else if (token[0] == '/')
+			{
+				cur_desc.type = node_type::div;
+			}
+			else if (token[0] == '*')
+			{
+				cur_desc.type = node_type::mul;
+			}
+
+		}
+			break;
+		case tree_node_type::func:
+		{
+			auto opt_type = magic_enum::enum_cast<node_type>(token);
+			cur_desc.type = opt_type.value();
+		}
+			break;
+		default:
+			break;
+		}
+		result.nodes[cur_desc.idx] = cur_desc;
+
+	}
+	void compact()
+	{
+		// 把多个连续的add 和mul 替换为一个 这样计算的时候效率会高很多
+		if (m_type != tree_node_type::op || (token[0] != '+' && token[0] != '*') || children.size() != 2)
+		{
+			for (auto one_child : children)
+			{
+				one_child->compact();
+			}
+		}
+		else
+		{
+			std::vector<tree_node*> temp_parents;
+			tree_node* temp_node = children[0];
+			children[0] = children[1];
+			children.pop_back();
+			while (temp_node->token == token)
+			{
+				children.push_back(temp_node->children[1]);
+				temp_parents.push_back(temp_node);
+				temp_node = temp_node->children[0];
+
+			}
+			children.push_back(temp_node);
+			std::reverse(children.begin(), children.end());
+			for (auto one_parent : temp_parents)
+			{
+				delete one_parent;
+			}
+			temp_parents.clear();
+			for (auto one_child : children)
+			{
+				one_child->compact();
+			}
 		}
 	}
 };
@@ -217,7 +335,7 @@ std::string_view strip_token(std::string_view input_str)
 	return cur_token_vec[0].first;
 }
 
-tree_node* create_math_tree(const std::string& input, const std::unordered_map<std::string, std::int8_t>& func_arg_num)
+tree_node* create_math_tree(const std::string& input, const std::unordered_map<std::string, std::uint8_t>& func_arg_num)
 {
 	std::unordered_map<std::string_view, op_priority> op_priority_map = {
 		{"(", op_priority::func_paren},
@@ -228,6 +346,7 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 		{"-", op_priority::add_minus},
 		{",", op_priority::comma},
 	};
+	std::uint32_t node_idx_counter = 1;
 	auto tokens = split_tokens(input);
 	if (tokens.empty() || tokens.back().second == token_type::invalid)
 	{
@@ -250,7 +369,12 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 		{
 			auto new_node = new tree_node();
 			new_node->token = one_token.first;
-			new_node->m_type = node_type::value;
+			new_node->m_type = tree_node_type::value;
+			char* number_end = nullptr;
+			const char* number_begin = one_token.first.data();
+			auto cur_value = std::strtold(number_begin, &number_end);
+			new_node->value = cur_value;
+			new_node->node_idx = node_idx_counter++;
 			m_value_stack.emplace(std::make_pair(one_token.first, new_node));
 			break;
 		}
@@ -261,7 +385,8 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 			{
 				auto new_node = new tree_node();
 				new_node->token = one_token.first;
-				new_node->m_type = node_type::value;
+				new_node->m_type = tree_node_type::variable;
+				new_node->node_idx = node_idx_counter++;
 				m_value_stack.emplace(std::make_pair(one_token.first, new_node));
 				break;
 			}
@@ -305,7 +430,8 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 						{
 							auto new_node = new tree_node();
 							new_node->token = cur_top.second;
-							new_node->m_type = node_type::func;
+							new_node->m_type = tree_node_type::func;
+							new_node->node_idx = node_idx_counter++;
 							new_node->children.push_back(m_value_stack.top().second);
 							if (!new_node->convert_args(func_arg_num))
 							{
@@ -328,7 +454,8 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 						}
 						auto new_node = new tree_node();
 						new_node->token = cur_top.second;
-						new_node->m_type = node_type::op;
+						new_node->m_type = tree_node_type::op;
+						new_node->node_idx = node_idx_counter++;
 						new_node->children.push_back(m_value_stack.top().second);
 						m_value_stack.pop();
 						new_node->children.push_back(m_value_stack.top().second);
@@ -354,7 +481,8 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 						}
 						auto new_node = new tree_node();
 						new_node->token = cur_top.second;
-						new_node->m_type = node_type::op;
+						new_node->m_type = tree_node_type::op;
+						new_node->node_idx = node_idx_counter++;
 						new_node->children.push_back(m_value_stack.top().second);
 						m_value_stack.pop();
 						new_node->children.push_back(m_value_stack.top().second);
@@ -384,6 +512,7 @@ tree_node* create_math_tree(const std::string& input, const std::unordered_map<s
 	}
 	else
 	{
+		m_value_stack.top().second->compact();
 		return m_value_stack.top().second;
 	}
 }
@@ -394,7 +523,7 @@ void simple_test()
 		"1",
 		"-1",
 		"-1 + 2",
-		"1 + 2",
+		"1 + 2 + 3",
 		"(1+ 2)",
 		"1 + sin(2)",
 		"sin(1 + sin(2) * 3)",
@@ -404,7 +533,7 @@ void simple_test()
 		"1* 2 - 3 + add(2, 3)",
 		"1 * var_1 - var_2 * 3"
 	};
-	std::unordered_map<std::string, std::int8_t> func_arg_num = {
+	std::unordered_map<std::string, std::uint8_t> func_arg_num = {
 		{"sin", 1},
 		{"add", 2}
 	};
@@ -425,12 +554,12 @@ void simple_test()
 	}
 }
 
-void test_cpp_file(const std::string& file_path)
+void dump_cpp_formula(const std::string& input_file_path, const std::string& output_folder)
 {
-	std::ifstream fsm(file_path);
+	std::ifstream fsm(input_file_path);
 	std::string temp_line;
-	std::unordered_map<std::string, double> input_vars;
-	std::unordered_map<std::string, std::int8_t> input_funcs;
+	std::unordered_set<std::string> input_vars;
+	std::unordered_map<std::string, std::uint8_t> input_funcs;
 	std::unordered_map<std::string, tree_node*> output_vars;
 	while (std::getline(fsm, temp_line))
 	{
@@ -462,7 +591,7 @@ void test_cpp_file(const std::string& file_path)
 				std::cerr << "invalid function line " << temp_line << std::endl;
 				continue;
 			}
-			auto cur_func_name = temp_line.substr(function_begin_iter, function_end_iter - function_begin_iter - 1);
+			auto cur_func_name = temp_line.substr(function_begin_iter, function_end_iter - function_begin_iter);
 			cur_func_name = strip_token(cur_func_name);
 			if (cur_func_name.empty())
 			{
@@ -513,7 +642,7 @@ void test_cpp_file(const std::string& file_path)
 					std::cerr << "invalid  input declear " << temp_line << std::endl;
 					continue;
 				}
-				input_vars[cur_var_name] = cur_value;
+				input_vars.insert(cur_var_name);
 				std::cout << "get input var " << cur_var_name << " with value " << cur_value << std::endl;
 			}
 			else
@@ -526,16 +655,44 @@ void test_cpp_file(const std::string& file_path)
 				}
 				output_vars[cur_var_name] = cur_formula;
 				std::cout << "get output var " << cur_var_name << " with formula " << cur_formula->to_string() << std::endl;
+				cacl_tree cur_formula_tree;
+				cacl_node_desc cur_root_node;
+				cur_root_node.idx = 0;
+				cur_root_node.type = node_type::root;
+				cur_root_node.children.push_back(cur_formula->node_idx);
+				cur_root_node.value = 0;
+				cur_formula_tree.nodes[0] = cur_root_node;
+				cur_formula->to_tree(input_vars, cur_formula_tree);
+				std::string dest_path = output_folder + "/" + cur_var_name + ".json";
+				std::ofstream dest_of(dest_path);
+				json final_json;
+				std::vector<cacl_node_desc> all_nodes;
+				for (const auto& one_node : cur_formula_tree.nodes)
+				{
+					all_nodes.push_back(one_node.second);
+				}
+				final_json["nodes"] = spiritsaway::serialize::encode(all_nodes);
+				final_json["name"] = cur_var_name + ".json";
+				final_json["extra"] = json::object_t();
+				dest_of << final_json.dump(4) << std::endl;
+
 			}
 		}
 
 	}
 }
-int main()
+int main(int argc , const char** argv)
 {
-	std::cout << std::filesystem::current_path() << std::endl;
+	if (argc != 3)
+	{
+		std::cerr << "need  args (input_file_path dest_folder_path) to run" << std::endl;
+		return 1;
+	}
+	std::string input_file_path = argv[1];
+	std::string dest_folder_path = argv[2];
+	// std::cout << std::filesystem::current_path() << std::endl;
 	// simple_test();
-	test_cpp_file("../../data/dota2.cpp");
+	dump_cpp_formula(input_file_path, dest_folder_path);
 	return 1;
 
 }
