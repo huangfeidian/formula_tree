@@ -674,6 +674,16 @@ void dump_cpp_formula(const std::string& input_file_path, const std::string& out
 				final_json["nodes"] = spiritsaway::serialize::encode(all_nodes);
 				final_json["name"] = cur_var_name + ".json";
 				final_json["extra"] = json::object_t();
+				time_t rawtime;
+				struct tm* timeinfo;
+				char buffer[80];
+
+				time(&rawtime);
+				timeinfo = localtime(&rawtime);
+
+				strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", timeinfo);
+
+				final_json["signature"] = std::string(buffer);
 				dest_of << final_json.dump(4) << std::endl;
 
 			}
