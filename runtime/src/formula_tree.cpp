@@ -11,6 +11,7 @@ formula_value_tree::formula_value_tree(const formula_structure_tree& in_node_tre
 	: m_node_tree(in_node_tree)
 	, m_node_values(in_node_tree.nodes().size(), 1.0)
 	, m_node_in_queue_flag(in_node_tree.nodes().size(), 0)
+	, m_node_watch_idxes(in_node_tree.nodes().size(), 0)
 {
 
 }
@@ -28,10 +29,15 @@ void formula_value_tree::process_update_queue()
 				add_node_to_update_queue(one_parent);
 			}
 		}
-
+		
 		if (cur_top->cacl_type == node_type::root)
 		{
-			m_updated_attrs.push_back(attr_update_info{ cur_top->m_node_idx, m_node_values[cur_top->m_node_idx] });
+			auto cur_watch_idx = m_node_watch_idxes[cur_top->m_node_idx];
+			if (cur_watch_idx)
+			{
+				m_updated_attrs.push_back(attr_update_info{ cur_top->m_node_idx, cur_watch_idx, m_node_values[cur_top->m_node_idx] });
+			}
+			
 			if (m_debug_on)
 			{
 				cur_top->pretty_print_value(m_node_values, reached_name);
@@ -249,6 +255,36 @@ void formula_value_tree::pretty_print_value() const
 				
 			}
 		}
+	}
+}
+
+void formula_value_tree::watch_nodes(const std::unordered_map<std::string, std::uint32_t>& watch_indexes)
+{
+	m_updated_attrs.clear();
+	std::fill(m_node_watch_idxes.begin(), m_node_watch_idxes.end(), 0);
+	const auto& all_names = m_node_tree.name_to_idx();
+	for (const auto& one_pair : watch_indexes)
+	{
+		auto temp_iter = all_names.find(one_pair.first);
+		if (temp_iter == all_names.end())
+		{
+			continue;
+		}
+		m_node_watch_idxes[temp_iter->second] = one_pair.second;
+	}
+}
+
+std::uint32_t formula_value_tree::name_to_node_idx(const std::string& attr_name) const
+{
+	const auto& all_names = m_node_tree.name_to_idx();
+	auto temp_iter = all_names.find(attr_name);
+	if (temp_iter == all_names.end())
+	{
+		return m_node_values.size();
+	}
+	else
+	{
+		return temp_iter->second;
 	}
 }
 

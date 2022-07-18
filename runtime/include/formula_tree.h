@@ -41,6 +41,7 @@ namespace spiritsaway::formula_tree::runtime
 	struct attr_update_info
 	{
 		std::uint32_t node_idx;
+		std::uint32_t watch_idx;
 		double value;
 	};
 	class formula_value_tree
@@ -51,7 +52,9 @@ namespace spiritsaway::formula_tree::runtime
 
 		std::priority_queue<const calc_node*, std::vector<const calc_node*>, node_compare> update_queue;
 		std::vector<std::uint8_t> m_node_in_queue_flag;
+		std::vector<std::uint32_t> m_node_watch_idxes;
 		std::vector<std::uint32_t> m_in_queue_nodes;
+
 		bool m_debug_on = false;
 		bool add_node_to_update_queue(const calc_node* new_node);
 		friend class calc_node;
@@ -84,6 +87,8 @@ namespace spiritsaway::formula_tree::runtime
 		{
 			return m_updated_attrs;
 		}
+
+		void watch_nodes(const std::unordered_map<std::string, std::uint32_t>& watch_indexes);
 
 	};
 	class formula_tree_mgr
