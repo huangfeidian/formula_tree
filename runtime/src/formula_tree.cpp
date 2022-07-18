@@ -323,7 +323,7 @@ void formula_tree_mgr::set_repo_dir(const std::string& in_repo_dir)
 		{
 			continue;
 		}
-		std::ifstream tree_file(one_entry);
+		std::ifstream tree_file(one_entry.path().string());
 		std::string tree_file_content((std::istreambuf_iterator<char>(tree_file)), std::istreambuf_iterator<char>());
 		if (!json::accept(tree_file_content))
 		{
