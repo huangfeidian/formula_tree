@@ -119,6 +119,7 @@ struct tree_node
 	{
 		cacl_node_desc cur_desc;
 		cur_desc.idx = node_idx;
+		cur_desc.value = 0;
 		for (const auto& one_child : children)
 		{
 			cur_desc.children.push_back(one_child->node_idx);

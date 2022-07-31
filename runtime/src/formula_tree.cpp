@@ -365,6 +365,7 @@ const cacl_tree& formula_tree_mgr::load_tree(const std::string& tree_name)
 	auto cur_iter = total_trees.find(tree_name);
 	if (cur_iter == total_trees.end())
 	{
+		std::cerr<<"fail to load tree "<<tree_name<<std::endl;
 		return invalid_info;
 	}
 	else
