@@ -17,11 +17,11 @@ using namespace std;
 std::string formula_editor_window::new_file_name()
 {
 	std::string temp = fmt::format("new_formula_tree_{}.json", get_seq());
-	std::filesystem::path temp_path = data_folder / temp;
+	std::filesystem::path temp_path = m_data_folder / temp;
 	while (already_open(temp) || std::filesystem::exists(temp_path))
 	{
 		temp = fmt::format("new_formula_tree_{}.json", get_seq());
-		temp_path = data_folder / temp;
+		temp_path = m_data_folder / temp;
 	}
 	return temp;
 }
@@ -57,7 +57,7 @@ bool formula_editor_window::load_config()
 		
 		auto cur_dialog = new path_config_dialog(path_reqs, config_file_name, this);
 		auto temp_result = cur_dialog->run();
-		if (!cur_dialog->valid)
+		if (!cur_dialog->m_valid)
 		{
 			QMessageBox::about(this, QString("Error"),
 				QString::fromStdString("invalid formula node config"));
@@ -132,7 +132,7 @@ bool formula_editor_window::load_config()
 		node_config_repo::instance().load_config(std::get<json::object_t>(node_json_variant));
 	}
 
-	data_folder = save_path;
+	m_data_folder = save_path;
 	return true;
 }
 
@@ -148,9 +148,9 @@ basic_node* formula_editor_window::create_node_from_desc(const basic_node_desc& 
 	{
 		parent->add_child(cur_node);
 	}
-	cur_node->color = cur_desc.color;
-	cur_node->_is_collapsed = cur_desc.is_collpased;
-	cur_node->comment = cur_desc.comment;
+	cur_node->m_color = cur_desc.color;
+	cur_node->m_is_collapsed = cur_desc.is_collpased;
+	cur_node->m_comment = cur_desc.comment;
 	cur_node->refresh_editable_items();
 	cur_node->set_extra(json(cur_desc.extra));
 	return cur_node;
