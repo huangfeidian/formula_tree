@@ -13,7 +13,42 @@ formula_value_tree::formula_value_tree(const formula_structure_tree& in_node_tre
 	, m_node_in_queue_flag(in_node_tree.nodes().size(), 0)
 	, m_node_watch_idxes(in_node_tree.nodes().size(), 0)
 {
+	update_in_constructor();
+}
 
+void formula_value_tree::update_in_constructor()
+{
+	// 触发一次全量更新
+	for (int i = 0; i < m_node_values.size(); i++)
+	{
+		auto cur_node_desc = m_node_tree.nodes()[i];
+		if (cur_node_desc.cacl_type == node_type::literal)
+		{
+			m_node_tree.nodes()[i].update_value(this, m_node_values, m_node_tree.literals()[i]);
+		}
+		else if (cur_node_desc.cacl_type == node_type::input)
+		{
+			m_node_tree.nodes()[i].update_value(this, m_node_values, 1.0);
+		}
+	}
+	m_updated_attrs.clear();
+	while (!update_queue.empty())
+	{
+		auto cur_top = update_queue.top();
+		update_queue.pop();
+		cur_top->update(m_node_values);
+		for (auto one_parent : cur_top->parents)
+		{
+			add_node_to_update_queue(one_parent);
+		}
+
+	}
+	for (const auto& one_idx : m_in_queue_nodes)
+	{
+		m_node_in_queue_flag[one_idx] = 0;
+	}
+	m_in_queue_nodes.clear();
+	
 }
 void formula_value_tree::process_update_queue()
 {
@@ -145,6 +180,7 @@ formula_structure_tree::formula_structure_tree(const formula_desc_flat& flat_nod
 {
 	std::uint32_t name_idx = 0;
 	m_nodes.reserve(flat_nodes_info.flat_nodes.size());
+	m_literals.resize(flat_nodes_info.flat_nodes.size(), 0);
 	// create all nodes
 	for (auto& one_node : flat_nodes_info.flat_nodes)
 	{
@@ -154,7 +190,12 @@ formula_structure_tree::formula_structure_tree(const formula_desc_flat& flat_nod
 			cur_node_name = "T-" + std::to_string(name_idx++);
 		}
 		auto cur_pointer_node = calc_node(this, m_nodes.size(), cur_node_name, one_node.type);
+		if (one_node.type == node_type::literal)
+		{
+			m_literals[m_nodes.size()] = one_node.value;
+		}
 		m_nodes.push_back(cur_pointer_node);
+
 	}
 	// map names to node pointer
 	auto node_begin_pointer = m_nodes.data();

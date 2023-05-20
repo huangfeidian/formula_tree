@@ -25,6 +25,7 @@ namespace spiritsaway::formula_tree::runtime
 	{
 		std::unordered_map<std::string, std::uint32_t> m_name_to_idx;
 		std::vector<calc_node> m_nodes;
+		std::vector<double> m_literals;
 	public:
 		formula_structure_tree(const formula_desc_flat& flat_nodes_info);
 		const std::unordered_map<std::string, std::uint32_t>& name_to_idx() const
@@ -35,7 +36,10 @@ namespace spiritsaway::formula_tree::runtime
 		{
 			return m_nodes;
 		}
-
+		const std::vector<double> literals() const
+		{
+			return m_literals;
+		}
 		friend class formula_tree_mgr;
 	};
 	struct attr_update_info
@@ -59,7 +63,7 @@ namespace spiritsaway::formula_tree::runtime
 		bool add_node_to_update_queue(const calc_node* new_node);
 		friend class calc_node;
 		void process_update_queue();
-
+		void update_in_constructor();
 		friend class formula_tree_mgr;
 	public:
 		formula_value_tree(const formula_structure_tree& in_node_tree);
@@ -87,7 +91,7 @@ namespace spiritsaway::formula_tree::runtime
 		{
 			return m_updated_attrs;
 		}
-
+		// 将一些attr的名字映射为外部的一些索引 更新attr的时候顺便会更新m_updated_attrs 外部可以通过这些索引来加速处理 不再需要名字来查找
 		void watch_nodes(const std::unordered_map<std::string, std::uint32_t>& watch_indexes);
 
 	};
