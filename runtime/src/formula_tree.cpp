@@ -350,7 +350,7 @@ formula_value_tree* formula_tree_mgr::load_formula_group(const std::string& form
 	{
 		auto cur_flat_info = formula_desc_flat(output_node);
 		auto cur_tree = new formula_structure_tree(cur_flat_info);
-		named_formulas[formula_group_name] = cur_tree;
+		named_formulas[formula_group_name] = std::unique_ptr<formula_structure_tree>(cur_tree);
 		return new formula_value_tree(*cur_tree);
 	}
 }
