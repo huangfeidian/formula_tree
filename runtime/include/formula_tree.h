@@ -59,7 +59,7 @@ namespace spiritsaway::formula_tree::runtime
 		std::vector<std::uint32_t> m_node_watch_idxes;
 		std::vector<std::uint32_t> m_in_queue_nodes;
 
-		bool m_debug_on = false;
+		std::function<void(const std::string&)> m_debug_print_func;
 		bool add_node_to_update_queue(const calc_node* new_node);
 		friend class calc_node;
 		void process_update_queue();
@@ -84,9 +84,9 @@ namespace spiritsaway::formula_tree::runtime
 			return m_node_tree.nodes()[node_idx].name;
 		}
 		~formula_value_tree();
-		void pretty_print() const;
-		void pretty_print_value() const;
-		void set_debug(bool debug_on);
+		std::string pretty_print() const;
+		std::string pretty_print_value() const;
+		void set_debug(std::function<void(const std::string&)> debug_func);
 		const std::vector< attr_update_info>& updated_attrs() const
 		{
 			return m_updated_attrs;

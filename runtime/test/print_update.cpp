@@ -19,6 +19,9 @@ int main()
 	};
 	formula_tree_mgr::instance().set_repo_dir("../../data/export/");
 	auto cur_formula_tree = formula_tree_mgr::instance().load_formula_group("player", formula_desc{ related_outputs });
-	cur_formula_tree->set_debug(true);
+	cur_formula_tree->set_debug([](const std::string& info)
+		{
+			std::cout << info;
+		});
 	cur_formula_tree->update_attr("level", 2);
 }

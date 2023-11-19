@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "formula_desc.h"
+#include <sstream>
 namespace spiritsaway::formula_tree::runtime
 {
 	class formula_structure_tree;
@@ -33,8 +34,8 @@ namespace spiritsaway::formula_tree::runtime
 		{
 			return m_height;
 		}
-		std::string pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const;
-		std::string pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const;
+		std::string pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names, std::ostringstream& oss) const;
+		std::string pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names, std::ostringstream& oss) const;
 		std::string print_formula(const std::vector<double>& node_values, const std::vector<std::string>& arg_names) const;
 	};
 }

@@ -38,7 +38,7 @@ void calc_node::update_value(formula_value_tree* value_tree, std::vector<double>
 }
 
 
-std::string calc_node::pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
+std::string calc_node::pretty_print(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names, std::ostringstream& oss) const
 {
 	switch (cacl_type)
 	{
@@ -64,32 +64,33 @@ std::string calc_node::pretty_print(const std::vector<double>& node_values, std:
 	std::vector<std::string> child_formulas;
 	for (auto one_child: children)
 	{
-		child_formulas.push_back(one_child->pretty_print(node_values, print_names));
+		child_formulas.push_back(one_child->pretty_print(node_values, print_names, oss));
 	}
 	
 	auto result = calc_node::print_formula(node_values, child_formulas);
 	if (result.size() >= 50)
 	{
-		std::cout << name << " = " << result << std::endl;
+		oss << name << " = " << result << std::endl;
 		return name;
 	}
 	else
 	{
 		if (cacl_type == node_type::root)
 		{
-			std::cout << name << " = " << result << std::endl;
+			oss << name << " = " << result << std::endl;
 			return name;
 		}
 		return result;
 	}
 }
-std::string calc_node::pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names) const
+std::string calc_node::pretty_print_value(const std::vector<double>& node_values, std::unordered_set<std::string>& print_names, std::ostringstream& oss) const
 {
+	auto value = node_values[m_node_idx];
 	if (print_names.count(name) != 0)
 	{
-		return "";
+		return name + "(" + std::to_string(value) + ")";
 	}
-	auto value = node_values[m_node_idx];
+	
 	switch (cacl_type)
 	{
 	case node_type::literal:
@@ -114,21 +115,21 @@ std::string calc_node::pretty_print_value(const std::vector<double>& node_values
 	std::vector<std::string> child_formulas;
 	for (auto one_child: children)
 	{
-		child_formulas.push_back(one_child->pretty_print_value(node_values, print_names));
+		child_formulas.push_back(one_child->pretty_print_value(node_values, print_names, oss));
 	}
 	
 	auto result = calc_node::print_formula(node_values, child_formulas);
 	if (result.size() >= 50)
 	{
-		std::cout << name + "(" + std::to_string(value) + ")" << " = " << result << std::endl;
+		oss << name + "(" + std::to_string(value) + ")" << " = " << result << std::endl;
 		return name + "(" + std::to_string(value) + ")";;
 	}
 	else
 	{
 		if (cacl_type == node_type::root)
 		{
-			std::cout << name + "(" + std::to_string(value) + ")" << " = " << result << std::endl;
-			return name + "(" + std::to_string(value) + ")";;
+			oss << name + "(" + std::to_string(value) + ")" << " = " << result << std::endl;
+			return name + "(" + std::to_string(value) + ")";
 		}
 		return result;
 	}

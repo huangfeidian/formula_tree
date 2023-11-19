@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <magic_enum.hpp>
+#include <sstream>
 using namespace spiritsaway::formula_tree::runtime;
 
 formula_value_tree::formula_value_tree(const formula_structure_tree& in_node_tree)
@@ -73,9 +74,11 @@ void formula_value_tree::process_update_queue()
 				m_updated_attrs.push_back(attr_update_info{ cur_top->m_node_idx, cur_watch_idx, m_node_values[cur_top->m_node_idx] });
 			}
 			
-			if (m_debug_on)
+			if (m_debug_print_func)
 			{
-				cur_top->pretty_print_value(m_node_values, reached_name);
+				std::ostringstream oss;
+				cur_top->pretty_print_value(m_node_values, reached_name, oss);
+				m_debug_print_func(oss.str());
 			}
 		}
 	}
@@ -85,9 +88,9 @@ void formula_value_tree::process_update_queue()
 	}
 	m_in_queue_nodes.clear();
 }
-void formula_value_tree::set_debug(bool in_debug_on)
+void formula_value_tree::set_debug(std::function<void(const std::string&)> debug_func)
 {
-	m_debug_on = in_debug_on;
+	m_debug_print_func = debug_func;
 }
 formula_value_tree::~formula_value_tree()
 {
@@ -253,9 +256,10 @@ formula_structure_tree::formula_structure_tree(const formula_desc_flat& flat_nod
 }
 
 
-void formula_value_tree::pretty_print() const
+std::string formula_value_tree::pretty_print() const
 {
 	std::unordered_set<std::string> reached_names;
+	std::ostringstream buffer;
 	const auto& temp_nodes = m_node_tree.nodes();
 	for (auto[k, v] : m_node_tree.name_to_idx())
 	{
@@ -264,23 +268,25 @@ void formula_value_tree::pretty_print() const
 		{
 			if (reached_names.count(k) == 0)
 			{
-				auto pre_result = cur_node.pretty_print(m_node_values, reached_names);
+				auto pre_result = cur_node.pretty_print(m_node_values, reached_names, buffer);
 				if (pre_result != k)
 				{
-					std::cout << k << "=" << pre_result << std::endl;
+					buffer << k << "=" << pre_result << std::endl;
 
 				}
 			}
 			
 		}
 	}
+	return buffer.str();
 }
 
 
-void formula_value_tree::pretty_print_value() const
+std::string formula_value_tree::pretty_print_value() const
 {
 	std::unordered_set<std::string> reached_names;
 	const auto& temp_nodes = m_node_tree.nodes();
+	std::ostringstream buffer;
 	for (auto[k, v] : m_node_tree.name_to_idx())
 	{
 		const auto& cur_node = temp_nodes[v];
@@ -288,15 +294,17 @@ void formula_value_tree::pretty_print_value() const
 		{
 			if (reached_names.count(k) == 0)
 			{
-				auto pre_result = cur_node.pretty_print_value(m_node_values, reached_names);
+				auto pre_result = cur_node.pretty_print_value(m_node_values, reached_names, buffer);
 				if (pre_result.find(k + "(") != 0)
 				{
-					std::cout << k << "=" << pre_result << std::endl;
+
+					buffer << k << "=" << pre_result << std::endl;
 				}
 				
 			}
 		}
 	}
+	return buffer.str();
 }
 
 void formula_value_tree::watch_nodes(const std::unordered_map<std::string, std::uint32_t>& watch_indexes)
