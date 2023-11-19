@@ -99,7 +99,7 @@ namespace spiritsaway::formula_tree::runtime
 	{
 		std::unordered_map<std::string, cacl_tree> total_trees;
 		std::string repo_dir;
-		std::unordered_map<std::string, formula_structure_tree*> named_formulas;
+		std::unordered_map<std::string, std::unique_ptr<formula_structure_tree>> named_formulas;
 		formula_tree_mgr();
 	public:
 		formula_value_tree* load_formula_group(const std::string& formula_group_name, const formula_desc& output_node);
