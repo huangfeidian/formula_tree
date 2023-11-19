@@ -1,0 +1,82 @@
+{
+    "extra": {},
+    "name": "magical_damage_final_ratio.json",
+    "nodes": [
+        {
+            "children": [
+                1,
+                6
+            ],
+            "extra": {
+                "value": 0.0
+            },
+            "idx": 7,
+            "type": "dec"
+        },
+        {
+            "children": [
+                2,
+                5
+            ],
+            "extra": {
+                "value": 0.0
+            },
+            "idx": 6,
+            "type": "mul"
+        },
+        {
+            "children": [
+                3,
+                4
+            ],
+            "extra": {
+                "value": 0.0
+            },
+            "idx": 5,
+            "type": "add"
+        },
+        {
+            "children": [],
+            "extra": {
+                "value": "extra_magic_defence"
+            },
+            "idx": 4,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "extra": {
+                "value": "base_magic_defence"
+            },
+            "idx": 3,
+            "type": "input"
+        },
+        {
+            "children": [],
+            "extra": {
+                "value": 0.01
+            },
+            "idx": 2,
+            "type": "literal"
+        },
+        {
+            "children": [],
+            "extra": {
+                "value": 1.0
+            },
+            "idx": 1,
+            "type": "literal"
+        },
+        {
+            "children": [
+                7
+            ],
+            "extra": {
+                "value": 0.0
+            },
+            "idx": 0,
+            "type": "root"
+        }
+    ],
+    "signature": "31-07-2022 23:17:19"
+}
