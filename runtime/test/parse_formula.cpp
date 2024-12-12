@@ -8,7 +8,7 @@
 #include <fstream>
 #include <filesystem>
 #include <unordered_set>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <any_container/encode.h>
 #include "formula_desc.h"
 
