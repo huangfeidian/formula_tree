@@ -4,7 +4,7 @@
 #include <any_container/decode.h>
 #include <filesystem>
 #include <fstream>
-#include <magic_enum/magic_enum.hpp>
+#include <magic_enum.hpp>
 #include <sstream>
 using namespace spiritsaway::formula_tree::runtime;
 
