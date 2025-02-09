@@ -13,6 +13,7 @@ if(MSVC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 endif(MSVC)
 
+option(WITH_GUI "with gui" ON)
 # add log support
 find_package(spdlog CONFIG REQUIRED)
 INCLUDE_DIRECTORIES(${spdlog_include_dirs})
@@ -36,7 +37,7 @@ endif()
 
 add_subdirectory(runtime)
 
-if(IS_TOPLEVEL_PROJECT)
+if(WITH_GUI)
 
 add_subdirectory(editor)
-endif(IS_TOPLEVEL_PROJECT)
+endif(WITH_GUI)
