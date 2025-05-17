@@ -56,3 +56,4 @@ add_executable(formula_tree_editor ${UI_FILES}  ${TREE_EDITOR_HEADER} ${EDITOR_S
 
 
 target_link_libraries(formula_tree_editor PUBLIC tree_editor::tree_editor Qt5::Widgets nlohmann_json::nlohmann_json any_container)
+target_include_directories(formula_tree_editor INTERFACE $<INSTALL_INTERFACE:include>)
